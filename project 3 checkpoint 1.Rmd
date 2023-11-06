@@ -1,0 +1,85 @@
+---
+title: "Project 3 Checkpoint 1"
+author: "Max Lippman"
+date: "2023-11-05"
+output:
+  html_document: default
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Package Installation
+
+```{r}
+if(require(pacman)==FALSE) install.packages("pacman")
+pacman::p_load(#DataExplorer, # For explorer and cleaning data by visualizing missing values.
+               gptstudio,#For coding assistance
+               httr, # For downloading the data from the UCI
+               tidyverse, # For data manipulation
+               sjPlot, 
+               corrplot, # for heatmaps
+               DataExplorer, #for exploring data
+               skimr # for nice summary of data
+               ) # For creating dummy variables of categorical variables automatically.)
+```
+
+## Introduction
+
+This document is meant to summarize where we currently are (group 8) in the beginning off our analysis project for ISA 616.
+
+## Client
+Skip Benamati and the Business Analytics/ISA Dept.
+
+## Problem Statement
+It is challenging to predict demand for the program and course size for the Business Analytics program. Skip and the BA department would like to know the forecasted number of students so that courses are not offered over abundantly or insufficiently.
+
+## Research Questions we Want to Answer
+* How many students are forecasted to be in the Spring 2024 BA cohort? 
+* Historically, what characteristics define students who stay with the BA major?
+* Historically, what characteristics define students who don’t stay with the BA major?
+* What majors are people transferring to BA from?
+* What courses have a significant impact on whether students stay with the BA major?
+
+## Our Final Deliverables
+* An RMarkdown document containing background information on our project scope, BVP, and questions to answer.
+* A document containing our EDA analysis that guides viewers through the steps we took to clean our data.
+* A dashboard containing visuals, graphs, and tables that visualize our findings per our research questions.
+* A document containing our conclusions, final insights, and further recommendations to Skip and the BA department.
+
+## Timeline
+* Friday 11/3 - observe the data and define expectations for the group and project scope
+Assignees : ALL
+
+* Sunday 11/5 - have BVP submitted, Github setup (First checkpoint)
+BVP Assignees : Marti
+Project Documentation Assignees: Alaina, Max
+GitHub repo setup: Jenna
+
+* Thursday 11/9 - have data cleaned and merged, Rmarkdown file used that includes the documentation our work
+Data Cleaning : Jenna
+Data Merging: Marti 
+Adding context and Relevant information to file : Max, Alaina
+
+* Friday 11/10- Meet with client to ensure our product / model aligns with their needs
+Assignees: ALL
+Tuesday 11/14 - find students to potentially interview who have left or switched into the BA major (?)
+Assignees: Max
+
+* Thursday 11/16 - Dashboard template created
+Assignees: Marti
+
+* Wednesday 11/29 - final project turned in
+Assignees: ALL
+
+* 11/30, 12/5, 12/7, 12/8 - presentations to the class
+Assignees: ALL
+
+* Friday 12/8 - final project delivered to client
+Assignees: ALL
+
+## Our Business Value Proposition
