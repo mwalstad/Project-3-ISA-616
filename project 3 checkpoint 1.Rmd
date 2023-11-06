@@ -1,6 +1,6 @@
 ---
 title: "Project 3 Checkpoint 1"
-author: "Max Lippman"
+author: "Max Lippman, Marti Walstad, Jenna Sayle, Alaina Edwards"
 date: "2023-11-05"
 output:
   html_document: default
@@ -33,53 +33,101 @@ pacman::p_load(#DataExplorer, # For explorer and cleaning data by visualizing mi
 This document is meant to summarize where we currently are (group 8) in the beginning off our analysis project for ISA 616.
 
 ## Client
+
 Skip Benamati and the Business Analytics/ISA Dept.
 
 ## Problem Statement
-It is challenging to predict demand for the program and course size for the Business Analytics program. Skip and the BA department would like to know the forecasted number of students so that courses are not offered over abundantly or insufficiently.
+
+It is challenging to predict demand for the program and course size for the Business Analytics program.
+Skip and the BA department would like to know the forecasted number of students so that courses are not offered over abundantly or insufficiently.
 
 ## Research Questions we Want to Answer
-* How many students are forecasted to be in the Spring 2024 BA cohort? 
-* Historically, what characteristics define students who stay with the BA major?
-* Historically, what characteristics define students who don’t stay with the BA major?
-* What majors are people transferring to BA from?
-* What courses have a significant impact on whether students stay with the BA major?
+
+-   How many students are forecasted to be in the Spring 2024 BA cohort?
+-   Historically, what characteristics define students who stay with the BA major?
+-   Historically, what characteristics define students who don't stay with the BA major?
+-   What majors are people transferring to BA from?
+-   What courses have a significant impact on whether students stay with the BA major?
 
 ## Our Final Deliverables
-* An RMarkdown document containing background information on our project scope, BVP, and questions to answer.
-* A document containing our EDA analysis that guides viewers through the steps we took to clean our data.
-* A dashboard containing visuals, graphs, and tables that visualize our findings per our research questions.
-* A document containing our conclusions, final insights, and further recommendations to Skip and the BA department.
+
+-   An RMarkdown document containing background information on our project scope, BVP, and questions to answer.
+-   A document containing our EDA analysis that guides viewers through the steps we took to clean our data.
+-   A dashboard containing visuals, graphs, and tables that visualize our findings per our research questions.
+-   A document containing our conclusions, final insights, and further recommendations to Skip and the BA department.
 
 ## Timeline
-* Friday 11/3 - observe the data and define expectations for the group and project scope
-Assignees : ALL
 
-* Sunday 11/5 - have BVP submitted, Github setup (First checkpoint)
-BVP Assignees : Marti
-Project Documentation Assignees: Alaina, Max
-GitHub repo setup: Jenna
+-   Friday 11/3 - observe the data and define expectations for the group and project scope Assignees : ALL
 
-* Thursday 11/9 - have data cleaned and merged, Rmarkdown file used that includes the documentation our work
-Data Cleaning : Jenna
-Data Merging: Marti 
-Adding context and Relevant information to file : Max, Alaina
+-   Sunday 11/5 - have BVP submitted, Github setup (First checkpoint) BVP Assignees : Marti, Project Documentation Assignees: Alaina and Max, GitHub repo setup: Jenna
 
-* Friday 11/10- Meet with client to ensure our product / model aligns with their needs
-Assignees: ALL
-Tuesday 11/14 - find students to potentially interview who have left or switched into the BA major (?)
-Assignees: Max
+-   Thursday 11/9 - have data cleaned and merged, Rmarkdown file used that includes the documentation our work Data Cleaning : Jenna Data Merging: Marti Adding context and Relevant information to file : Max, Alaina
 
-* Thursday 11/16 - Dashboard template created
-Assignees: Marti
+-   Friday 11/10- Meet with client to ensure our product / model aligns with their needs Assignees: ALL Tuesday 11/14 - find students to potentially interview who have left or switched into the BA major (?) Assignees: Max
 
-* Wednesday 11/29 - final project turned in
-Assignees: ALL
+-   Thursday 11/16 - Dashboard template created Assignees: Marti
 
-* 11/30, 12/5, 12/7, 12/8 - presentations to the class
-Assignees: ALL
+-   Wednesday 11/29 - final project turned in Assignees: ALL
 
-* Friday 12/8 - final project delivered to client
-Assignees: ALL
+-   11/30, 12/5, 12/7, 12/8 - presentations to the class Assignees: ALL
+
+-   Friday 12/8 - final project delivered to client Assignees: ALL
 
 ## Our Business Value Proposition
+
+![](BVP_group8.png)
+
+Client: 
+
+-   Skip Benamati Professor and chair of the Information Systems & Analytics along with his staff including Alan Clift (Data and planning Analyst)
+
+Jobs:
+
+-   Accurately predict demand for classes
+
+-   Understand the flow of students in and out of Business Analytics major
+
+Pains:
+
+-   Before:
+
+    -   Abundance of BA majors who end up dropping  
+
+-   During: 
+
+    -   Student retention -- understanding characteristics of students who stay and do not stay with the BA major
+
+    -   Understanding what students are switching to the BA major
+
+    -   If BA courses have an impact on whether students stay in business analytics
+
+-   After:
+
+    -   Over offering classes (results in too many small sized classes)
+
+Solution:
+
+-   Dashboard with insights about Business Analytics students using graphs and other visuals
+
+Pain Killers:
+
+-   Identify key characteristics of students who leave the major 
+
+-   Identify classes that may need curriculum change in order to retain my students
+
+-   Understand why students switch to the BA major and what majors they come from 
+
+Gains:
+
+-   Confidence promoting program
+
+-   Pipeline of students from advising 
+
+-   Use for other majors (ISA)
+
+Gain Creators:
+
+-   Advice tailored to the results on how to better market the BA program
+
+-   Resources for advising that help identify prospective BA students 
