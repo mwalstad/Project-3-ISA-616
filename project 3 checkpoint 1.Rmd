@@ -34,7 +34,7 @@ This document is meant to summarize where we currently are (group 8) in the begi
 
 ## Client
 
-Skip Benamati and the Business Analytics/ISA Dept.
+Skip Benamati, Alan Strautman, and the Business Analytics/ISA Dept.
 
 ## Problem Statement
 
@@ -44,11 +44,10 @@ Skip and the BA department would like to know the forecasted number of students 
 ## Research Questions we Want to Answer
 
 -   How many students are forecasted to be in the Spring 2024 BA cohort?
--   Historically, what characteristics define students who stay with the BA major?
--   Historically, what characteristics define students who don't stay with the BA major?
--   What majors are people transferring to BA from?
--   What courses have a significant impact on whether students stay with the BA major?
-
+-   Is there a relationship between any student characteristics and students who stay with the BA major?
+-   Is there a relationship between any student characteristics and students who leave the BA major?
+-   Are there any majors at Miami University that have a relationship with students joining or leaving the BA program? 
+-   Do certain courses moderate the relationship between students joining and leaving the BA program?
 ## Our Final Deliverables
 
 -   An RMarkdown document containing background information on our project scope, BVP, and questions to answer.
