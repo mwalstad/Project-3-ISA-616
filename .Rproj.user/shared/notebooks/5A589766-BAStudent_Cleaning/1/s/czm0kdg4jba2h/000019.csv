@@ -1,0 +1,7 @@
+"0","# Read data"
+"0","Grades=read_excel(""data-raw/BA Major Students - Grades.xlsx"")"
+"0","# Fill in the blank cells created from the format of the data"
+"0","Grades = Grades %>% "
+"0","  fill(c(`Student ID`),.direction=""down"")"
+"0",""
+"0","head(Grades)"

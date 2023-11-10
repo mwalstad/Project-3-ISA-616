@@ -1,0 +1,69 @@
+---
+title: "Project 3 - Data Cleaning"
+author: "Max Lippman, Marti Walstad, Jenna Sayle, Alaina Edwards"
+author: "Marti Walstad and Alaina Edwards"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    toc-expand: true
+    code-tools: true 
+    code-fold: true
+    code-overflow: scroll
+    self-contained: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if(require(pacman)==FALSE) install.packages("pacman")
+pacman::p_load(#DataExplorer, # For explorer and cleaning data by visualizing missing values.
+               gptstudio,#For coding assistance
+               httr, # For downloading the data from the UCI
+               tidyverse, # For data manipulation
+               sjPlot, 
+               corrplot, # for heatmaps
+               DataExplorer, #for exploring data
+               skimr # for nice summary of data
+               ) # For creating dummy variables of categorical variables automatically.)
+```
+
+```{r}
+sessionInfo()
+```
+```{r}
+# Install and load necessary packages
+install.packages("readxl")
+install.packages("dplyr")
+library(readxl)
+library(dplyr)
+```
+
+
+```{r}
+# Read Excel files
+file1 <- read.csv("Attributes.csv")
+file1 = file1 %>% select(-`X`)
+
+file2 <- read.csv("BA_Majors.csv")
+file2 = file2 %>% select(-`X`)
+
+# Combine data frames
+merged_data <- merge(file1, file2, by = c("Student.ID", "Term.Code"))
+
+# Write combined data frame to a new Excel file
+saveRDS(merged_data, "StudentData")
+```
+
+```{r}
+count_table <- file1 %>%
+  group_by(Term.Code) %>%
+  summarise(DistinctStudentCount = n_distinct(Student.ID))
+
+# Print the new table
+print(count_table)
+```
+

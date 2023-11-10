@@ -1,0 +1,135 @@
+---
+title: "BA Student Movement Data Cleaning"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+author: "Allison Jones-Farmer"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    toc-expand: true
+    code-tools: true 
+    code-fold: true
+    code-overflow: scroll
+    self-contained: true
+    #bibliography: winerefs.bib
+---
+
+
+## Package Installation and Initialization
+
+In this portion we use `pacman` to install the necessary packages and clear the global environment.
+
+```{r setup,message=FALSE,warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE,message=FALSE,warning=FALSE, out.width = "100%")
+#package initialization
+rm(list = ls()) # clear global environment
+graphics.off() # close all graphics
+if(require(pacman)==FALSE) install.packages("pacman")
+pacman::p_load(DataExplorer, # For explorer and cleaning data by visualizing missing values.
+               httr, # For downloading the data from the UCI
+               tidyverse, # For data manipulation
+               corrplot, # for heatmaps
+               DataExplorer, #for exploring data
+               skimr, # for nice summary of data
+               readxl #to read Excel files
+               ) # For creating dummy variables of categorical variables automatically.)
+```
+
+## Load data
+
+### Loading BA Students
+
+This is the list of students under consideration.  Here is the logic for this data pull:
+
+* Cohort Academic Year Number is equal to 2020 , 2021 , 2022 , 2023 , 2024				
+* Cohort Semester Name is equal to / is in Fall				
+  * Case When Majors and Concentrations."Major"= 'Business Analytics' And Concentrations and Thematic Sequences."Concentration" = 'Basic Program (no submajor)' Then 'BA Major' When Majors and Concentrations."Major" = 'Analytics' And Concentrations and Thematic... is equal to / is in BA Major or Minor is equal to / is in Business Analytics
+
+```{r}
+BA_Students=read_excel("data-raw/BA Major Students.xlsx")
+head(BA_Students)
+paste("The number of rows in the data is ",nrow(BA_Students))
+paste("The number of unique students is ",length(unique(BA_Students$`Student ID`)))
+write.csv(BA_Students,"data-clean/BA_Students.csv")
+
+```
+
+
+### Loading BA Majors
+
+Below I read in the data and fill in the missing values with the correct values.  The level of analysis is Student ID X Term Code.  Each student has a row for each term they have been enrolled.  Some students have one row, others have eight.
+
+Finally, I make sure that each student has the Cohort Term that is equal to the earliest date on record.
+
+```{r}
+# Read data
+BA_Majors=read_excel("data-raw/BA Major Students - Majors.xlsx")
+# Fill in the blank cells created from the format of the data
+BA_Majors=BA_Majors %>% 
+  fill(c(`Student ID`:`Term Code`),.direction="down")
+#Create a separate column for each major.  Unit of analysis here is student by Term Code
+BA_Majors=BA_Majors %>% 
+  group_by(`Student ID`,`Term Code`) %>% 
+  mutate(Major_Number=paste("Major",row_number())) %>% 
+  pivot_wider(names_from=Major_Number, values_from=`BA Major`) 
+
+# Set the Cohort Term to the smallest observed value for a given student. 
+BA_Majors=BA_Majors %>% 
+  group_by(`Student ID`) %>% 
+  mutate(`Cohort Term`=min(`Cohort Term`)) 
+
+head(BA_Majors)
+paste("The number of rows is ",nrow(BA_Majors))
+paste("The number of unique students is ",length(unique((BA_Majors$`Student ID`))))
+
+write.csv(BA_Majors,"data-clean/BA_Majors.csv")
+```
+
+### Loading Grades
+
+Loaded student grades, filled in missing cells according to the data structure.  There are only 694 students.  This is possibly because the freshmen do not yet have grades. I checked this, and there are 140 freshmen who have no grades.  694+140=834.  We have 823 unique students in the file.  It is possible that 834+823=11 students in cohort 202410 have grades, possibly due to dual enrollment or summer classes prior to the Fall semester.
+
+```{r}
+# Read data
+Grades=read_excel("data-raw/BA Major Students - Grades.xlsx")
+# Fill in the blank cells created from the format of the data
+Grades = Grades %>% 
+  fill(c(`Student ID`),.direction="down")
+
+head(Grades)
+tail(Grades)
+paste("The number of unique students is ",length(unique(Grades$`Student ID`)))
+num_fresh=BA_Majors %>%
+  filter(`Cohort Term`=="202410")%>%
+  nrow()
+paste("The number of students starting in term 201410 is ", num_fresh)
+
+write.csv(Grades,"data-clean/Grades.csv")
+```
+
+### Loading Attributes
+
+Below I load in the Attributes.  There are 134 students with missing cumulative GPA.  
+
+The level of analysis for the final data frame is Student ID X Term Code.
+
+```{r}
+# Read data
+Attributes=read_excel("data-raw/BA Major Students - Attributes and CUM GPA.xlsx")
+# Fill in the blank cells created from the format of the data
+Attributes = Attributes %>% 
+  fill(c(`Student ID`:`First Generation Indicator`),.direction="down")
+
+paste("The number of unique students is ",length(unique(Attributes$`Student ID`)))
+
+head(Attributes)
+test=Attributes %>% 
+  filter(is.na(`Cum UG Crs GPA`))
+
+paste("The number of students with no grades ",length(unique(test$`Student ID`)))
+write.csv(Attributes,"data-clean/Attributes.csv")
+```
+
+
+
+
