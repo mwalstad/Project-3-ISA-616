@@ -1,0 +1,7 @@
+*.log
+BA Major*
+.RData
+.Rhistory
+Attributes.csv
+BA_Majors.csv
+BA_Students.csv
