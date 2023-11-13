@@ -59,7 +59,7 @@ saveRDS(merged_data, "StudentData")
 ```
 
 ```{r}
-count_table <- file1 %>%
+count_table <- merged_data %>%
   group_by(Term.Code) %>%
   summarise(DistinctStudentCount = n_distinct(Student.ID))
 
@@ -67,3 +67,28 @@ count_table <- file1 %>%
 print(count_table)
 ```
 
+```{r}
+minors <- read_excel("BA Major Students - Minors.xlsx")
+minors <- minors %>% rename(Student.ID = `Student ID`, Term.Code = `Term Code`, Cohort.Term = `Cohort Term`)
+minors = minors %>% select(-`Enrolled Student Count`)
+
+merged_data <- merge(merged_data, minors, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
+merged_data = merged_data %>% select(-`Cohort.Term.y`)
+
+```
+
+```{r}
+thematic <- read_excel("BA Major Students - Thematic Sequence ISA2.xlsx")
+thematic <- thematic %>% rename(Student.ID = `Student ID`, Term.Code = `Term Code`, Thematic.Sequence.Title = `Thematic Sequence Title`)
+thematic = thematic %>% select(-`Enrolled Student Count`)
+
+merged_data <- merge(merged_data, thematic, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
+```
+
+```{r}
+merged_data <- merged_data %>% group_by(Student.ID) %>% mutate (Flag = ifelse(n() < 8 & tail(Term.Code, 1) != '202410', 1,0)) %>% ungroup()
+```
+
+```{r}
+flagged = merged_data %>% filter(Flag == 1)
+```
