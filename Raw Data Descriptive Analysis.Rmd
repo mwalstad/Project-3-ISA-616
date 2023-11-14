@@ -1,0 +1,136 @@
+---
+title: "Raw data analysis"
+output: html_document
+date: "2023-11-14"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if(require(pacman)==FALSE) install.packages("pacman")
+pacman::p_load(#DataExplorer, # For explorer and cleaning data by visualizing missing values.
+               gptstudio,#For coding assistance
+               httr, # For downloading the data from the UCI
+               tidyverse, # For data manipulation
+               sjPlot, 
+               corrplot, # for heatmaps
+               DataExplorer, #for exploring data
+               skimr # for nice summary of data
+               ) # For creating dummy variables of categorical variables automatically.)
+```
+
+```{r}
+sessionInfo()
+```
+```{r}
+# Install and load necessary packages
+install.packages("readxl")
+install.packages("dplyr")
+library(readxl)
+library(dplyr)
+```
+
+## ISA2 Applied Business Statistics Dataset
+
+```{r}
+data = read_excel("C:/Users/Max/Downloads/raw data 616 project 3/Thematic Sequence.xlsx")
+print(data)
+```
+```{r}
+p = ggplot(data, aes(x = `Term Code`, y = `Enrolled Student Count`)) +
+  geom_bar(stat = "identity", color = "steelblue", fill = "steelblue", width = 0.8) +
+  xlab("Term Code") +
+  ylab("Enrolled Student Count") +
+  ggtitle("ISA2 Thematic Sequence Enrollment over Terms") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better visibility
+
+p
+
+```
+## Business Analytics Minors 
+
+```{r}
+data2 = read_excel("C:/Users/Max/Downloads/raw data 616 project 3/BA Minors.xlsx")
+print(data2)
+```
+```{r}
+p = ggplot(data2, aes(x = `Term Code`, y = `Enrolled Student Count`)) +
+  geom_bar(stat = "identity", color = "steelblue", fill = "steelblue", width = 0.8) +
+  xlab("Term Code") +
+  ylab("Enrolled Student Count") +
+  ggtitle("Business Analytics Minor Enrollment over Terms") + 
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+p
+
+
+```
+
+## Information Security Minors 
+
+```{r}
+data3 = read_excel("C:/Users/Max/Downloads/raw data 616 project 3/IS Minors.xlsx")
+print(data3)
+```
+```{r}
+p = ggplot(data3, aes(x = `Term Code`, y = `Enrolled Student Count`)) +
+  geom_bar(stat = "identity", color = "steelblue", fill = "steelblue", width = 0.8) +
+  xlab("Term Code") +
+  ylab("Enrolled Student Count") +
+  ggtitle("Information Security Minor Enrollment over Terms") + 
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+p
+
+
+```
+
+
+
+## Information Systems Minors 
+
+```{r}
+data4 = read_excel("C:/Users/Max/Downloads/raw data 616 project 3/IS2 Minors.xlsx")
+print(data4)
+```
+
+
+```{r}
+p = ggplot(data4, aes(x = `Term Code`, y = `Enrolled Student Count`)) +
+  geom_bar(stat = "identity", color = "steelblue", fill = "steelblue", width = 0.8) +
+  xlab("Term Code") +
+  ylab("Enrolled Student Count") +
+  ggtitle("Information Systems Minor Enrollment over Terms") + 
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+p
+
+
+```
+
+
+## Management of Information Tech Minors 
+
+```{r}
+data5 = read_excel("C:/Users/Max/Downloads/raw data 616 project 3/MIT Minors.xlsx")
+print(data5)
+```
+
+
+```{r}
+p = ggplot(data5, aes(x = `Term Code`, y = `Enrolled Student Count`)) +
+  geom_bar(stat = "identity", color = "steelblue", fill = "steelblue", width = 0.8) +
+  xlab("Term Code") +
+  ylab("Enrolled Student Count") +
+  ggtitle("Management of Information Tech Minor Enrollment over Terms") + 
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+p
+
+
+```
