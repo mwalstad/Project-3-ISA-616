@@ -15,20 +15,13 @@ pacman::p_load(#DataExplorer, # For explorer and cleaning data by visualizing mi
                sjPlot, 
                corrplot, # for heatmaps
                DataExplorer, #for exploring data
-               skimr # for nice summary of data
+               skimr,
+               readxl,
+               dplyr# for nice summary of data
                ) # For creating dummy variables of categorical variables automatically.)
 ```
 
-```{r}
-sessionInfo()
-```
-```{r}
-# Install and load necessary packages
-install.packages("readxl")
-install.packages("dplyr")
-library(readxl)
-library(dplyr)
-```
+
 
 ## ISA2 Applied Business Statistics Dataset
 
