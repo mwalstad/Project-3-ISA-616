@@ -1,0 +1,52 @@
+---
+title: "Project 3 - EDA"
+author: "Max Lippman, Marti Walstad, Jenna Sayle, Alaina Edwards"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    toc-expand: true
+    code-tools: true 
+    code-fold: true
+    code-overflow: scroll
+    self-contained: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if(require(pacman)==FALSE) install.packages("pacman")
+pacman::p_load(#DataExplorer, # For explorer and cleaning data by visualizing missing values.
+               gptstudio,#For coding assistance
+               httr, # For downloading the data from the UCI
+               tidyverse, # For data manipulation
+               sjPlot, 
+               corrplot, # for heatmaps
+               DataExplorer, #for exploring data
+               skimr # for nice summary of data
+               ) # For creating dummy variables of categorical variables automatically.)
+```
+
+```{r}
+sessionInfo()
+```
+
+```{r}
+# Install and load necessary packages
+install.packages("readxl")
+install.packages("dplyr")
+library(readxl)
+library(dplyr)
+```
+
+```{r}
+data = readRDS('Project3_StudentData')
+```
+
+```{r}
+
+```
+
