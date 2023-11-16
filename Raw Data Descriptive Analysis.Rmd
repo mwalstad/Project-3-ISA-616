@@ -26,7 +26,7 @@ pacman::p_load(#DataExplorer, # For explorer and cleaning data by visualizing mi
 ## ISA2 Applied Business Statistics Dataset
 
 ```{r}
-data = read_excel("C:/Users/Max/Downloads/raw data 616 project 3/Thematic Sequence.xlsx")
+data = read_excel("Thematic Sequence.xlsx")
 print(data)
 ```
 ```{r}
@@ -44,7 +44,7 @@ p
 ## Business Analytics Minors 
 
 ```{r}
-data2 = read_excel("C:/Users/Max/Downloads/raw data 616 project 3/BA Minors.xlsx")
+data2 = read_excel("BA Minors.xlsx")
 print(data2)
 ```
 ```{r}
@@ -64,7 +64,7 @@ p
 ## Information Security Minors 
 
 ```{r}
-data3 = read_excel("C:/Users/Max/Downloads/raw data 616 project 3/IS Minors.xlsx")
+data3 = read_excel("IS Minors.xlsx")
 print(data3)
 ```
 ```{r}
@@ -86,7 +86,7 @@ p
 ## Information Systems Minors 
 
 ```{r}
-data4 = read_excel("C:/Users/Max/Downloads/raw data 616 project 3/IS2 Minors.xlsx")
+data4 = read_excel("IS2 Minors.xlsx")
 print(data4)
 ```
 
@@ -109,7 +109,7 @@ p
 ## Management of Information Tech Minors 
 
 ```{r}
-data5 = read_excel("C:/Users/Max/Downloads/raw data 616 project 3/MIT Minors.xlsx")
+data5 = read_excel("MIT Minors.xlsx")
 print(data5)
 ```
 

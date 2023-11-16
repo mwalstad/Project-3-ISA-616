@@ -1,0 +1,114 @@
+---
+title: "Project 3 - Data Cleaning"
+author: "Max Lippman, Marti Walstad, Jenna Sayle, Alaina Edwards"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    toc-expand: true
+    code-tools: true 
+    code-fold: true
+    code-overflow: scroll
+    self-contained: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if(require(pacman)==FALSE) install.packages("pacman")
+pacman::p_load(#DataExplorer, # For explorer and cleaning data by visualizing missing values.
+               gptstudio,#For coding assistance
+               httr, # For downloading the data from the UCI
+               tidyverse, # For data manipulation
+               sjPlot, 
+               corrplot, # for heatmaps
+               DataExplorer, #for exploring data
+               skimr, # for nice summary of data
+               readxl,
+               dplyr
+               ) # For creating dummy variables of categorical variables automatically.)
+```
+
+```{r}
+sessionInfo()
+```
+
+
+```{r}
+# Read Excel files
+studentinfo <- read.csv("Attributes.csv")
+studentinfo = studentinfo %>% select(-`X`)
+
+studentlist <- read.csv("BA_Majors.csv")
+studentlsit = studentlist %>% select(-`X`)
+
+
+# Combine data frames
+merged_data <- merge(studentinfo, studentlist, by = c("Student.ID", "Term.Code"))
+merged_data = merged_data %>% select(-`X`)
+
+```
+
+```{r}
+count_table <- merged_data %>%
+  group_by(Term.Code) %>%
+  summarise(DistinctStudentCount = n_distinct(Student.ID))
+
+# Print the new table
+print(count_table)
+```
+
+```{r}
+minors <- read_excel("BA Major Students - Minors.xlsx")
+minors <- minors %>% rename(Student.ID = `Student ID`, Term.Code = `Term Code`, Cohort.Term = `Cohort Term`)
+minors = minors %>% select(-`Enrolled Student Count`)
+
+merged_data <- merge(merged_data, minors, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
+merged_data = merged_data %>% select(-`Cohort.Term.y`)
+
+```
+
+```{r}
+thematic <- read_excel("BA Major Students - Thematic Sequence ISA2.xlsx")
+thematic <- thematic %>% rename(Student.ID = `Student ID`, Term.Code = `Term Code`, Thematic.Sequence.Title = `Thematic Sequence Title`)
+thematic = thematic %>% select(-`Enrolled Student Count`)
+
+merged_data <- merge(merged_data, thematic, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
+```
+
+```{r}
+merged_with_flag <- merged_data %>% group_by(Student.ID) %>% filter (( last(Major.1) == 'BA Major' | last(Major.2) == 'BA Major' | last(Major.3) == 'BA Major' | last(Minor) == 'Business Analytics' | last(Thematic.Sequence.Title) == 'ISA2 Applied Business Statistics'))
+```
+
+
+```{r}
+merged_with_flag <- merged_with_flag %>% group_by(Student.ID) %>% mutate (Flag = ifelse(n() < 8 & tail(Term.Code, 1) != '202410', 1,0)) %>% ungroup()
+```
+
+```{r}
+flagged = merged_with_flag %>% filter(Flag == 1)
+```
+
+```{r}
+write.csv(merged_data, file = 'Student_Data_without_grades')
+```
+
+```{r}
+grades <- read_csv("Grades.csv")
+grades = grades %>% select(-`...1`, -`GPA Quality Points`, -`Final Letter Grade`)
+grades <- grades %>% rename(Student.ID = `Student ID`, Term.Code = `Term Code`, `Final Letter Grade Group` = `Final Letter Grade Group`)
+
+merged_data <- merge(merged_data, grades, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
+
+merged_data <- merged_data %>% rename(Cohort.Term = `Cohort.Term.x`)
+merged_data = merged_data %>% select(-`Earned Academic Credit`)
+```
+
+```{r}
+saveRDS(merged_data, 'Project3_StudentData')
+write.csv(merged_data, file = 'Student Data')
+```
+
