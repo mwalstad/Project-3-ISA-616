@@ -15,6 +15,7 @@ editor:
     wrap: 72
 ---
 
+## Session Information
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -36,30 +37,20 @@ pacman::p_load(#DataExplorer, # For explorer and cleaning data by visualizing mi
 sessionInfo()
 ```
 
-
+## Import and Merge FIles
 ```{r}
-# Read Excel files
+# Read in Attributes File and drop column
 studentinfo <- read.csv("Attributes.csv")
 studentinfo = studentinfo %>% select(-`X`)
 
+## Read in BA_Majors.csv and drop column
 studentlist <- read.csv("BA_Majors.csv")
-studentlsit = studentlist %>% select(-`X`)
+studentlist = studentlist %>% select(-`X`)
 
-
-# Combine data frames
+# Combine the two data frames
 merged_data <- merge(studentinfo, studentlist, by = c("Student.ID", "Term.Code"))
-merged_data = merged_data %>% select(-`X`)
-
 ```
 
-```{r}
-count_table <- merged_data %>%
-  group_by(Term.Code) %>%
-  summarise(DistinctStudentCount = n_distinct(Student.ID))
-
-# Print the new table
-print(count_table)
-```
 
 ```{r}
 minors <- read_excel("BA Major Students - Minors.xlsx")
@@ -76,20 +67,34 @@ thematic <- read_excel("BA Major Students - Thematic Sequence ISA2.xlsx")
 thematic <- thematic %>% rename(Student.ID = `Student ID`, Term.Code = `Term Code`, Thematic.Sequence.Title = `Thematic Sequence Title`)
 thematic = thematic %>% select(-`Enrolled Student Count`)
 
-merged_data <- merge(merged_data, thematic, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
+merged_data_1 <- merge(merged_data, thematic, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
 ```
 
 ```{r}
-merged_with_flag <- merged_data %>% group_by(Student.ID) %>% filter (( last(Major.1) == 'BA Major' | last(Major.2) == 'BA Major' | last(Major.3) == 'BA Major' | last(Minor) == 'Business Analytics' | last(Thematic.Sequence.Title) == 'ISA2 Applied Business Statistics'))
-```
-
-
-```{r}
-merged_with_flag <- merged_with_flag %>% group_by(Student.ID) %>% mutate (Flag = ifelse(n() < 8 & tail(Term.Code, 1) != '202410', 1,0)) %>% ungroup()
+#merged_with_flag <- merged_data %>% group_by(Student.ID) %>% filter (!( last(!(Major.1 == 'BA Major' | Major.2 == 'BA Major' | Major.3 == 'BA Major' |Minor == 'Business Analytics' | Thematic.Sequence.Title == 'ISA2 Applied Business Statistics'))))
 ```
 
 ```{r}
-flagged = merged_with_flag %>% filter(Flag == 1)
+merged_drop_last_2 <- merged_data_1 %>%
+  group_by(Student.ID) %>%
+  filter(!(last(Major.1 != 'BA Major' & Major.2 != 'BA Major' & Major.3 != 'BA Major' & Minor != 'Business Analytics' & Thematic.Sequence.Title != 'ISA2 Applied Business Statistics', order_by = Term.Code) & row_number() == n()))
+
+```
+
+```{r}
+#merged_with_flag <- merged_data %>% group_by(Student.ID) %>% slice(-n()) %>%ungroup() %>% filter(!(last((Major.1 == 'BA Major' | Major.2 == 'BA Major' | Major.3 == 'BA Major' | Minor == 'Business Analytics' | Thematic.Sequence.Title == 'ISA2 Applied Business Statistics'))))
+```
+
+```{r}
+#merged_with_flag <- merged_data %>% group_by(Student.ID) %>% filter(row_number() < n()) %>%ungroup() %>%filter(!last(Major.1 == 'BA Major' | Major.2 == 'BA Major' | Major.3 == 'BA Major' | Minor == 'Business Analytics' | Thematic.Sequence.Title == 'ISA2 Applied Business Statistics', order_by = Term.Code))
+```
+
+```{r}
+merged_with_flag_3 <- merged_drop_last_2 %>% group_by(Student.ID) %>% mutate (Flag = ifelse(n() < 8 & tail(Term.Code, 1) != '202410', 1,0)) %>% ungroup()
+```
+
+```{r}
+flagged_true_4 = merged_with_flag_3 %>% filter(Flag == 1)
 ```
 
 ```{r}
@@ -101,10 +106,19 @@ grades <- read_csv("Grades.csv")
 grades = grades %>% select(-`...1`, -`GPA Quality Points`, -`Final Letter Grade`)
 grades <- grades %>% rename(Student.ID = `Student ID`, Term.Code = `Term Code`, `Final Letter Grade Group` = `Final Letter Grade Group`)
 
-merged_data <- merge(merged_data, grades, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
+merged_with_flag_and_grades <- merge(merged_with_flag_3, grades, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
 
-merged_data <- merged_data %>% rename(Cohort.Term = `Cohort.Term.x`)
-merged_data = merged_data %>% select(-`Earned Academic Credit`)
+merged_with_flag_and_grades <- merged_with_flag_and_grades %>% rename(Cohort.Term = `Cohort.Term.x`)
+merged_with_flag_and_grades = merged_with_flag_and_grades %>% select(-`Earned Academic Credit`)
+```
+
+```{r}
+count_table <- merged_data %>%
+  group_by(Term.Code) %>%
+  summarise(DistinctStudentCount = n_distinct(Student.ID))
+
+# Print the new table
+print(count_table)
 ```
 
 ```{r}
