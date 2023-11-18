@@ -71,22 +71,9 @@ merged_data_1 <- merge(merged_data, thematic, by = c("Student.ID", "Term.Code"),
 ```
 
 ```{r}
-#merged_with_flag <- merged_data %>% group_by(Student.ID) %>% filter (!( last(!(Major.1 == 'BA Major' | Major.2 == 'BA Major' | Major.3 == 'BA Major' |Minor == 'Business Analytics' | Thematic.Sequence.Title == 'ISA2 Applied Business Statistics'))))
-```
-
-```{r}
 merged_drop_last_2 <- merged_data_1 %>%
   group_by(Student.ID) %>%
   filter(!(last(Major.1 != 'BA Major' & Major.2 != 'BA Major' & Major.3 != 'BA Major' & Minor != 'Business Analytics' & Thematic.Sequence.Title != 'ISA2 Applied Business Statistics', order_by = Term.Code) & row_number() == n()))
-
-```
-
-```{r}
-#merged_with_flag <- merged_data %>% group_by(Student.ID) %>% slice(-n()) %>%ungroup() %>% filter(!(last((Major.1 == 'BA Major' | Major.2 == 'BA Major' | Major.3 == 'BA Major' | Minor == 'Business Analytics' | Thematic.Sequence.Title == 'ISA2 Applied Business Statistics'))))
-```
-
-```{r}
-#merged_with_flag <- merged_data %>% group_by(Student.ID) %>% filter(row_number() < n()) %>%ungroup() %>%filter(!last(Major.1 == 'BA Major' | Major.2 == 'BA Major' | Major.3 == 'BA Major' | Minor == 'Business Analytics' | Thematic.Sequence.Title == 'ISA2 Applied Business Statistics', order_by = Term.Code))
 ```
 
 ```{r}
@@ -122,7 +109,7 @@ print(count_table)
 ```
 
 ```{r}
-saveRDS(merged_data, 'Project3_StudentData')
-write.csv(merged_data, file = 'Student Data')
+write.csv(merged_with_flag_and_grades, 'StudentData_withGrades')
+write.csv(merged_with_flag_3, file = 'StudentData')
 ```
 
