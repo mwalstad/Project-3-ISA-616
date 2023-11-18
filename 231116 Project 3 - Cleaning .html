@@ -3020,7 +3020,17 @@ vertical-align: -.125em;
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
 <div id="quarto-sidebar-toc-left" class="sidebar toc-left">
-  
+  <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#session-information" id="toc-session-information" class="nav-link active" data-scroll-target="#session-information">Session Information</a></li>
+  <li><a href="#import-and-merge-files" id="toc-import-and-merge-files" class="nav-link" data-scroll-target="#import-and-merge-files">Import and Merge Files</a></li>
+  <li><a href="#add-column-for-students-who-dropped-any-business-analytics-program" id="toc-add-column-for-students-who-dropped-any-business-analytics-program" class="nav-link" data-scroll-target="#add-column-for-students-who-dropped-any-business-analytics-program">Add Column for Students who dropped any business analytics program</a></li>
+  <li><a href="#adding-grade-information-with-students-by-term-code" id="toc-adding-grade-information-with-students-by-term-code" class="nav-link" data-scroll-target="#adding-grade-information-with-students-by-term-code">Adding Grade Information with Students by Term Code</a></li>
+  <li><a href="#export-files" id="toc-export-files" class="nav-link" data-scroll-target="#export-files">Export Files</a></li>
+  </ul>
+</nav>
 </div>
 <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
 </div>
@@ -3049,6 +3059,9 @@ vertical-align: -.125em;
 
 </header>
 
+<section id="session-information" class="level2">
+<h2 class="anchored" data-anchor-id="session-information">Session Information</h2>
+<p>For the purpose of data reproducibility, we included the session info and loaded all required packages in this one location.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
@@ -3104,126 +3117,117 @@ loaded via a namespace (and not attached):
 [73] xfun_0.40          sjmisc_2.8.9       pkgconfig_2.0.3   </code></pre>
 </div>
 </div>
+</section>
+<section id="import-and-merge-files" class="level2">
+<h2 class="anchored" data-anchor-id="import-and-merge-files">Import and Merge Files</h2>
+<p>Here we imported files: Attributes, BA_Majors, BA Major Students - Minors, BA Major Students - Thematic Sequence ISA2.</p>
+<ul>
+<li><p>Attributes.csv: renamed to studentinfo, this file identifies an individual student in a business analytics program by a Student.ID and columns include student information including their gender, first generation status, cumulative GPA, and term code. Each student has a row for every term they have been enrolled. We dropped the index column called X</p></li>
+<li><p>BA_Majors.csv: renamed to studentlist is similar to Attributes in which it identifies the student by Student.ID with a row for every term they have been enrolled at Miami. It also includes their cohort, and major (with a column for 3 potential majors. We dropped the index column called X and the Enrolled Student Count column because they were not important to our analysis.</p></li>
+<li><p>BA Major Students - Minors.xlsx: This file was renamed to minors and includes a table of students who were classified as Business Analytics minors along with a row for each term they were enrolled at Miami. The table also includes a column for their cohort which is their freshman semester at Miami. We renamed columns to match the other tables with the same columns and dropped unnecessary columns like Enrolled Student Count.</p></li>
+<li><p>BA Major Students - Thematic Sequence ISA2.xlsx: Renamed to thematic, this table represents all of the students who had at one point been enrolled in the business analytics thematic sequence titled “ISA2 Applied Business Statistics”. Like the other tables, this one includes Student.ID, Term.Code as well as the thematic sequence title.</p></li>
+</ul>
+<p>Each of these files loaded individually and merged into one common table on the Student.ID and Term.Code columns, and called merged_data. Repeated columns were dropped during this process so each row represents one term of enrollment for each student, and sequential information about the student during that sememster.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read Excel files</span></span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read in Attributes File and drop column</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>studentinfo <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;Attributes.csv&quot;</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>studentinfo <span class="ot">=</span> studentinfo <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">X</span><span class="st">`</span>)</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>studentlist <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;BA_Majors.csv&quot;</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>studentlsit <span class="ot">=</span> studentlist <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">X</span><span class="st">`</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Read in BA_Majors.csv and drop column</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>studentlist <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;BA_Majors.csv&quot;</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>studentlist <span class="ot">=</span> studentlist <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">X</span><span class="st">`</span>)</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine data frames</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> <span class="fu">merge</span>(studentinfo, studentlist, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>))</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">=</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">X</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine the two data frames</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> <span class="fu">merge</span>(studentinfo, studentlist, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>count_table <span class="ot">&lt;-</span> merged_data <span class="sc">%&gt;%</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Term.Code) <span class="sc">%&gt;%</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">DistinctStudentCount =</span> <span class="fu">n_distinct</span>(Student.ID))</span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>minors <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">&quot;BA Major Students - Minors.xlsx&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>minors <span class="ot">&lt;-</span> minors <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Student.ID =</span> <span class="st">`</span><span class="at">Student ID</span><span class="st">`</span>, <span class="at">Term.Code =</span> <span class="st">`</span><span class="at">Term Code</span><span class="st">`</span>, <span class="at">Cohort.Term =</span> <span class="st">`</span><span class="at">Cohort Term</span><span class="st">`</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>minors <span class="ot">=</span> minors <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Enrolled Student Count</span><span class="st">`</span>)</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the new table</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(count_table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 13 × 2
-   Term.Code DistinctStudentCount
-       &lt;int&gt;                &lt;int&gt;
- 1    201810                    2
- 2    201820                    2
- 3    201910                    5
- 4    201920                    5
- 5    202010                  180
- 6    202020                  180
- 7    202110                  323
- 8    202120                  324
- 9    202210                  542
-10    202220                  538
-11    202310                  675
-12    202320                  665
-13    202410                  627</code></pre>
-</div>
-</div>
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>minors <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">&quot;BA Major Students - Minors.xlsx&quot;</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>minors <span class="ot">&lt;-</span> minors <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Student.ID =</span> <span class="st">`</span><span class="at">Student ID</span><span class="st">`</span>, <span class="at">Term.Code =</span> <span class="st">`</span><span class="at">Term Code</span><span class="st">`</span>, <span class="at">Cohort.Term =</span> <span class="st">`</span><span class="at">Cohort Term</span><span class="st">`</span>)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>minors <span class="ot">=</span> minors <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Enrolled Student Count</span><span class="st">`</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> <span class="fu">merge</span>(merged_data, minors, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">=</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Cohort.Term.y</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> <span class="fu">merge</span>(merged_data, minors, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">=</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Cohort.Term.y</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>thematic <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">&quot;BA Major Students - Thematic Sequence ISA2.xlsx&quot;</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>thematic <span class="ot">&lt;-</span> thematic <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Student.ID =</span> <span class="st">`</span><span class="at">Student ID</span><span class="st">`</span>, <span class="at">Term.Code =</span> <span class="st">`</span><span class="at">Term Code</span><span class="st">`</span>, <span class="at">Thematic.Sequence.Title =</span> <span class="st">`</span><span class="at">Thematic Sequence Title</span><span class="st">`</span>)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>thematic <span class="ot">=</span> thematic <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Enrolled Student Count</span><span class="st">`</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> <span class="fu">merge</span>(merged_data, thematic, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>thematic <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">&quot;BA Major Students - Thematic Sequence ISA2.xlsx&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>thematic <span class="ot">&lt;-</span> thematic <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Student.ID =</span> <span class="st">`</span><span class="at">Student ID</span><span class="st">`</span>, <span class="at">Term.Code =</span> <span class="st">`</span><span class="at">Term Code</span><span class="st">`</span>, <span class="at">Thematic.Sequence.Title =</span> <span class="st">`</span><span class="at">Thematic Sequence Title</span><span class="st">`</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>thematic <span class="ot">=</span> thematic <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Enrolled Student Count</span><span class="st">`</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>merged_data_1 <span class="ot">&lt;-</span> <span class="fu">merge</span>(merged_data, thematic, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="add-column-for-students-who-dropped-any-business-analytics-program" class="level2">
+<h2 class="anchored" data-anchor-id="add-column-for-students-who-dropped-any-business-analytics-program">Add Column for Students who dropped any business analytics program</h2>
+<p>Our goal is to understand a business analytics student’s progression through their program and therefore we added a column titled flag to denote if they left their program or not. With this information, we can track what students leave which we will use in a predictive model as the target variable.</p>
+<p>In order to correctly flag if someone dropped their business analytics program (Major, Minor, or Thematic), we grouped the student by their ID, and if they dropped their program, we dropped their most recent semester. This is because each student only has the semesters before/during their business analytics program and one semester after. Therefore, to predict why they may have dropped, we are not including the semester after they dropped their program.</p>
+<p>Dropping this last semester in included in the table, merged_drop_last_2, and a column for flagged was added onto the merged_data table and called merged_with_flag_3. For reference, we also created a table of only students who flagged a 1, which means they dropped their program, to compare to the merged_data table and check for correctness.</p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>merged_drop_last_2 <span class="ot">&lt;-</span> merged_data_1 <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Student.ID) <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(<span class="fu">last</span>(Major<span class="fl">.1</span> <span class="sc">!=</span> <span class="st">&#39;BA Major&#39;</span> <span class="sc">&amp;</span> Major<span class="fl">.2</span> <span class="sc">!=</span> <span class="st">&#39;BA Major&#39;</span> <span class="sc">&amp;</span> Major<span class="fl">.3</span> <span class="sc">!=</span> <span class="st">&#39;BA Major&#39;</span> <span class="sc">&amp;</span> Minor <span class="sc">!=</span> <span class="st">&#39;Business Analytics&#39;</span> <span class="sc">&amp;</span> Thematic.Sequence.Title <span class="sc">!=</span> <span class="st">&#39;ISA2 Applied Business Statistics&#39;</span>, <span class="at">order_by =</span> Term.Code) <span class="sc">&amp;</span> <span class="fu">row_number</span>() <span class="sc">==</span> <span class="fu">n</span>()))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Student.ID) <span class="sc">%&gt;%</span> <span class="fu">mutate</span> (<span class="at">Flag =</span> <span class="fu">ifelse</span>(<span class="fu">n</span>() <span class="sc">&lt;</span> <span class="dv">8</span> <span class="sc">&amp;</span> <span class="fu">tail</span>(Term.Code, <span class="dv">1</span>) <span class="sc">!=</span> <span class="st">&#39;202410&#39;</span>, <span class="dv">1</span>,<span class="dv">0</span>)) <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>merged_with_flag_3 <span class="ot">&lt;-</span> merged_drop_last_2 <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Student.ID) <span class="sc">%&gt;%</span> <span class="fu">mutate</span> (<span class="at">Flag =</span> <span class="fu">ifelse</span>(<span class="fu">n</span>() <span class="sc">&lt;</span> <span class="dv">8</span> <span class="sc">&amp;</span> <span class="fu">tail</span>(Term.Code, <span class="dv">1</span>) <span class="sc">!=</span> <span class="st">&#39;202410&#39;</span>, <span class="dv">1</span>,<span class="dv">0</span>)) <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>flagged <span class="ot">=</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Flag <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>flagged_true_4 <span class="ot">=</span> merged_with_flag_3 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Flag <span class="sc">==</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+</section>
+<section id="adding-grade-information-with-students-by-term-code" class="level2">
+<h2 class="anchored" data-anchor-id="adding-grade-information-with-students-by-term-code">Adding Grade Information with Students by Term Code</h2>
+<p>To help predict if students dropped the program or not, we also included grade information for classes important to business analytics students. This includes a row for each the class the student took along with their StudentID, semester, and grade result. Unimportant columns were dropped, and other columns renamed to match previous tables. The grade data was merged into the merge_data file that was created above.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(merged_data, <span class="at">file =</span> <span class="st">&#39;Student_Data_without_grades&#39;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>grades <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;Grades.csv&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>grades <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;Grades.csv&quot;</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>New names:
-Rows: 4584 Columns: 8
-── Column specification
-──────────────────────────────────────────────────────── Delimiter: &quot;,&quot; chr
-(4): Course, Earned Academic Credit, Final Letter Grade Group, Final Let... dbl
-(4): ...1, Student ID, Term Code, GPA Quality Points
-ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
-Specify the column types or set `show_col_types = FALSE` to quiet this message.
 • `` -&gt; `...1`</code></pre>
 </div>
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>grades <span class="ot">=</span> grades <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">...1</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">GPA Quality Points</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">Final Letter Grade</span><span class="st">`</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>grades <span class="ot">&lt;-</span> grades <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Student.ID =</span> <span class="st">`</span><span class="at">Student ID</span><span class="st">`</span>, <span class="at">Term.Code =</span> <span class="st">`</span><span class="at">Term Code</span><span class="st">`</span>, <span class="st">`</span><span class="at">Final Letter Grade Group</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Final Letter Grade Group</span><span class="st">`</span>)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> <span class="fu">merge</span>(merged_data, grades, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Cohort.Term =</span> <span class="st">`</span><span class="at">Cohort.Term.x</span><span class="st">`</span>)</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">=</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Earned Academic Credit</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>grades <span class="ot">=</span> grades <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">...1</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">GPA Quality Points</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">Final Letter Grade</span><span class="st">`</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>grades <span class="ot">&lt;-</span> grades <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Student.ID =</span> <span class="st">`</span><span class="at">Student ID</span><span class="st">`</span>, <span class="at">Term.Code =</span> <span class="st">`</span><span class="at">Term Code</span><span class="st">`</span>, <span class="st">`</span><span class="at">Final Letter Grade Group</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Final Letter Grade Group</span><span class="st">`</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>merged_with_flag_and_grades <span class="ot">&lt;-</span> <span class="fu">merge</span>(merged_with_flag_3, grades, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>merged_with_flag_and_grades <span class="ot">&lt;-</span> merged_with_flag_and_grades <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Cohort.Term =</span> <span class="st">`</span><span class="at">Cohort.Term.x</span><span class="st">`</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>merged_with_flag_and_grades <span class="ot">=</span> merged_with_flag_and_grades <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Earned Academic Credit</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+</section>
+<section id="export-files" class="level2">
+<h2 class="anchored" data-anchor-id="export-files">Export Files</h2>
+<p>We created two final tables. One tables is the merged student information with the flag denoting if they left the program or not. The second table is that same merged info with the flag along with student Grades. Both of these tables are exported to .csv files as ‘StudentData’ and ’StudentData_withGrades, respectively.</p>
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(merged_data, <span class="st">&#39;Project3_StudentData&#39;</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(merged_data, <span class="at">file =</span> <span class="st">&#39;Student Data&#39;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(merged_with_flag_and_grades, <span class="st">&#39;StudentData_withGrades&#39;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(merged_with_flag_3, <span class="at">file =</span> <span class="st">&#39;StudentData&#39;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <!-- -->
 
+</section>
 
 </main>
 <!-- /main column -->
@@ -3511,114 +3515,133 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
-<div class="sourceCode" id="cb15" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;Project 3 - Data Cleaning&quot;</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> &quot;Max Lippman, Marti Walstad, Jenna Sayle, Alaina Edwards&quot;</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> </span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-location: left</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-expand: true</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true </span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: true</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co">    code-overflow: scroll</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co">    self-contained: true</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="an">editor:</span><span class="co"> </span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co">  markdown: </span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co">    wrap: 72</span></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="in">```{r setup, include=FALSE}</span></span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">echo =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="fu">require</span>(pacman)<span class="sc">==</span><span class="cn">FALSE</span>) <span class="fu">install.packages</span>(<span class="st">&quot;pacman&quot;</span>)</span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(<span class="co">#DataExplorer, # For explorer and cleaning data by visualizing missing values.</span></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>               gptstudio,<span class="co">#For coding assistance</span></span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>               httr, <span class="co"># For downloading the data from the UCI</span></span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>               tidyverse, <span class="co"># For data manipulation</span></span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>               sjPlot, </span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>               corrplot, <span class="co"># for heatmaps</span></span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>               DataExplorer, <span class="co">#for exploring data</span></span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>               skimr, <span class="co"># for nice summary of data</span></span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>               readxl,</span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>               dplyr</span>
-<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>               ) <span class="co"># For creating dummy variables of categorical variables automatically.)</span></span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span>
-<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a><span class="co"># Read Excel files</span></span>
-<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a>studentinfo <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;Attributes.csv&quot;</span>)</span>
-<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a>studentinfo <span class="ot">=</span> studentinfo <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">X</span><span class="st">`</span>)</span>
-<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-49"><a href="#cb15-49" aria-hidden="true" tabindex="-1"></a>studentlist <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;BA_Majors.csv&quot;</span>)</span>
-<span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a>studentlsit <span class="ot">=</span> studentlist <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">X</span><span class="st">`</span>)</span>
-<span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine data frames</span></span>
-<span id="cb15-54"><a href="#cb15-54" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> <span class="fu">merge</span>(studentinfo, studentlist, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>))</span>
-<span id="cb15-55"><a href="#cb15-55" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">=</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">X</span><span class="st">`</span>)</span>
-<span id="cb15-56"><a href="#cb15-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-57"><a href="#cb15-57" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb15-58"><a href="#cb15-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-61"><a href="#cb15-61" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb15-62"><a href="#cb15-62" aria-hidden="true" tabindex="-1"></a>count_table <span class="ot">&lt;-</span> merged_data <span class="sc">%&gt;%</span></span>
-<span id="cb15-63"><a href="#cb15-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Term.Code) <span class="sc">%&gt;%</span></span>
-<span id="cb15-64"><a href="#cb15-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">DistinctStudentCount =</span> <span class="fu">n_distinct</span>(Student.ID))</span>
-<span id="cb15-65"><a href="#cb15-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-66"><a href="#cb15-66" aria-hidden="true" tabindex="-1"></a><span class="co"># Print the new table</span></span>
-<span id="cb15-67"><a href="#cb15-67" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(count_table)</span>
-<span id="cb15-68"><a href="#cb15-68" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb15-69"><a href="#cb15-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-72"><a href="#cb15-72" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb15-73"><a href="#cb15-73" aria-hidden="true" tabindex="-1"></a>minors <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">&quot;BA Major Students - Minors.xlsx&quot;</span>)</span>
-<span id="cb15-74"><a href="#cb15-74" aria-hidden="true" tabindex="-1"></a>minors <span class="ot">&lt;-</span> minors <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Student.ID =</span> <span class="st">`</span><span class="at">Student ID</span><span class="st">`</span>, <span class="at">Term.Code =</span> <span class="st">`</span><span class="at">Term Code</span><span class="st">`</span>, <span class="at">Cohort.Term =</span> <span class="st">`</span><span class="at">Cohort Term</span><span class="st">`</span>)</span>
-<span id="cb15-75"><a href="#cb15-75" aria-hidden="true" tabindex="-1"></a>minors <span class="ot">=</span> minors <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Enrolled Student Count</span><span class="st">`</span>)</span>
-<span id="cb15-76"><a href="#cb15-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-77"><a href="#cb15-77" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> <span class="fu">merge</span>(merged_data, minors, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb15-78"><a href="#cb15-78" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">=</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Cohort.Term.y</span><span class="st">`</span>)</span>
-<span id="cb15-79"><a href="#cb15-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-80"><a href="#cb15-80" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb15-81"><a href="#cb15-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-84"><a href="#cb15-84" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb15-85"><a href="#cb15-85" aria-hidden="true" tabindex="-1"></a>thematic <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">&quot;BA Major Students - Thematic Sequence ISA2.xlsx&quot;</span>)</span>
-<span id="cb15-86"><a href="#cb15-86" aria-hidden="true" tabindex="-1"></a>thematic <span class="ot">&lt;-</span> thematic <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Student.ID =</span> <span class="st">`</span><span class="at">Student ID</span><span class="st">`</span>, <span class="at">Term.Code =</span> <span class="st">`</span><span class="at">Term Code</span><span class="st">`</span>, <span class="at">Thematic.Sequence.Title =</span> <span class="st">`</span><span class="at">Thematic Sequence Title</span><span class="st">`</span>)</span>
-<span id="cb15-87"><a href="#cb15-87" aria-hidden="true" tabindex="-1"></a>thematic <span class="ot">=</span> thematic <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Enrolled Student Count</span><span class="st">`</span>)</span>
-<span id="cb15-88"><a href="#cb15-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-89"><a href="#cb15-89" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> <span class="fu">merge</span>(merged_data, thematic, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb15-90"><a href="#cb15-90" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb15-91"><a href="#cb15-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-94"><a href="#cb15-94" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb15-95"><a href="#cb15-95" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Student.ID) <span class="sc">%&gt;%</span> <span class="fu">mutate</span> (<span class="at">Flag =</span> <span class="fu">ifelse</span>(<span class="fu">n</span>() <span class="sc">&lt;</span> <span class="dv">8</span> <span class="sc">&amp;</span> <span class="fu">tail</span>(Term.Code, <span class="dv">1</span>) <span class="sc">!=</span> <span class="st">&#39;202410&#39;</span>, <span class="dv">1</span>,<span class="dv">0</span>)) <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>()</span>
-<span id="cb15-96"><a href="#cb15-96" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb15-97"><a href="#cb15-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-100"><a href="#cb15-100" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb15-101"><a href="#cb15-101" aria-hidden="true" tabindex="-1"></a>flagged <span class="ot">=</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Flag <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb15-102"><a href="#cb15-102" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb15-103"><a href="#cb15-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-106"><a href="#cb15-106" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb15-107"><a href="#cb15-107" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(merged_data, <span class="at">file =</span> <span class="st">&#39;Student_Data_without_grades&#39;</span>)</span>
-<span id="cb15-108"><a href="#cb15-108" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb15-109"><a href="#cb15-109" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-112"><a href="#cb15-112" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb15-113"><a href="#cb15-113" aria-hidden="true" tabindex="-1"></a>grades <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;Grades.csv&quot;</span>)</span>
-<span id="cb15-114"><a href="#cb15-114" aria-hidden="true" tabindex="-1"></a>grades <span class="ot">=</span> grades <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">...1</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">GPA Quality Points</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">Final Letter Grade</span><span class="st">`</span>)</span>
-<span id="cb15-115"><a href="#cb15-115" aria-hidden="true" tabindex="-1"></a>grades <span class="ot">&lt;-</span> grades <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Student.ID =</span> <span class="st">`</span><span class="at">Student ID</span><span class="st">`</span>, <span class="at">Term.Code =</span> <span class="st">`</span><span class="at">Term Code</span><span class="st">`</span>, <span class="st">`</span><span class="at">Final Letter Grade Group</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Final Letter Grade Group</span><span class="st">`</span>)</span>
-<span id="cb15-116"><a href="#cb15-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-117"><a href="#cb15-117" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> <span class="fu">merge</span>(merged_data, grades, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb15-118"><a href="#cb15-118" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-119"><a href="#cb15-119" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Cohort.Term =</span> <span class="st">`</span><span class="at">Cohort.Term.x</span><span class="st">`</span>)</span>
-<span id="cb15-120"><a href="#cb15-120" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">=</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Earned Academic Credit</span><span class="st">`</span>)</span>
-<span id="cb15-121"><a href="#cb15-121" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb15-122"><a href="#cb15-122" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-125"><a href="#cb15-125" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb15-126"><a href="#cb15-126" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(merged_data, <span class="st">&#39;Project3_StudentData&#39;</span>)</span>
-<span id="cb15-127"><a href="#cb15-127" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(merged_data, <span class="at">file =</span> <span class="st">&#39;Student Data&#39;</span>)</span>
-<span id="cb15-128"><a href="#cb15-128" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<div class="sourceCode" id="cb13" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;Project 3 - Data Cleaning&quot;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> &quot;Max Lippman, Marti Walstad, Jenna Sayle, Alaina Edwards&quot;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> </span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-location: left</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-expand: true</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true </span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: true</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co">    code-overflow: scroll</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co">    self-contained: true</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="an">editor:</span><span class="co"> </span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="co">  markdown: </span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="co">    wrap: 72</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Session Information</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>For the purpose of data reproducibility, we included the session info and loaded all required packages in this one location. </span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a><span class="in">```{r setup, include=FALSE}</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">echo =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="fu">require</span>(pacman)<span class="sc">==</span><span class="cn">FALSE</span>) <span class="fu">install.packages</span>(<span class="st">&quot;pacman&quot;</span>)</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(<span class="co">#DataExplorer, # For explorer and cleaning data by visualizing missing values.</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>               gptstudio,<span class="co">#For coding assistance</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>               httr, <span class="co"># For downloading the data from the UCI</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>               tidyverse, <span class="co"># For data manipulation</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>               sjPlot, </span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>               corrplot, <span class="co"># for heatmaps</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>               DataExplorer, <span class="co">#for exploring data</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>               skimr, <span class="co"># for nice summary of data</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>               readxl,</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>               dplyr</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>               ) <span class="co"># For creating dummy variables of categorical variables automatically.)</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a><span class="fu">## Import and Merge Files</span></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a>Here we imported files: Attributes, BA_Majors, BA Major Students - Minors, BA Major Students - Thematic Sequence ISA2. </span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Attributes.csv: renamed to studentinfo, this file identifies an individual student in a business analytics program by a Student.ID and columns include student information including their gender, first generation status, cumulative GPA, and term code. Each student has a row for every term they have been enrolled. We dropped the index column called X</span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>BA_Majors.csv: renamed to studentlist is similar to Attributes in which it identifies the student by Student.ID with a row for every term they have been enrolled at Miami. It also includes their cohort, and major (with a column for 3 potential majors. We dropped the index column called X and the Enrolled Student Count column because they were not important to our analysis.</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>BA Major Students - Minors.xlsx: This file was renamed to minors and includes a table of students who were classified as Business Analytics minors along with a row for each term they were enrolled at Miami. The table also includes a column for their cohort which is their freshman semester at Miami. We renamed columns to match the other tables with the same columns and dropped unnecessary columns like Enrolled Student Count. </span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>BA Major Students - Thematic Sequence ISA2.xlsx: Renamed to thematic, this table represents all of the students who had at one point been enrolled in the business analytics thematic sequence titled &quot;ISA2 Applied Business Statistics&quot;. Like the other tables, this one includes Student.ID, Term.Code as well as the thematic sequence title.</span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a>Each of these files loaded individually and merged into one common table on the Student.ID and Term.Code columns, and called merged_data. Repeated columns were dropped during this process so each row represents one term of enrollment for each student, and sequential information about the student during that sememster. </span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a><span class="co"># Read in Attributes File and drop column</span></span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true" tabindex="-1"></a>studentinfo <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;Attributes.csv&quot;</span>)</span>
+<span id="cb13-63"><a href="#cb13-63" aria-hidden="true" tabindex="-1"></a>studentinfo <span class="ot">=</span> studentinfo <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">X</span><span class="st">`</span>)</span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a><span class="do">## Read in BA_Majors.csv and drop column</span></span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a>studentlist <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;BA_Majors.csv&quot;</span>)</span>
+<span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a>studentlist <span class="ot">=</span> studentlist <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">X</span><span class="st">`</span>)</span>
+<span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine the two data frames</span></span>
+<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> <span class="fu">merge</span>(studentinfo, studentlist, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>))</span>
+<span id="cb13-71"><a href="#cb13-71" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-72"><a href="#cb13-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-75"><a href="#cb13-75" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-76"><a href="#cb13-76" aria-hidden="true" tabindex="-1"></a>minors <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">&quot;BA Major Students - Minors.xlsx&quot;</span>)</span>
+<span id="cb13-77"><a href="#cb13-77" aria-hidden="true" tabindex="-1"></a>minors <span class="ot">&lt;-</span> minors <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Student.ID =</span> <span class="st">`</span><span class="at">Student ID</span><span class="st">`</span>, <span class="at">Term.Code =</span> <span class="st">`</span><span class="at">Term Code</span><span class="st">`</span>, <span class="at">Cohort.Term =</span> <span class="st">`</span><span class="at">Cohort Term</span><span class="st">`</span>)</span>
+<span id="cb13-78"><a href="#cb13-78" aria-hidden="true" tabindex="-1"></a>minors <span class="ot">=</span> minors <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Enrolled Student Count</span><span class="st">`</span>)</span>
+<span id="cb13-79"><a href="#cb13-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-80"><a href="#cb13-80" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">&lt;-</span> <span class="fu">merge</span>(merged_data, minors, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-81"><a href="#cb13-81" aria-hidden="true" tabindex="-1"></a>merged_data <span class="ot">=</span> merged_data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Cohort.Term.y</span><span class="st">`</span>)</span>
+<span id="cb13-82"><a href="#cb13-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-83"><a href="#cb13-83" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-84"><a href="#cb13-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-87"><a href="#cb13-87" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-88"><a href="#cb13-88" aria-hidden="true" tabindex="-1"></a>thematic <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">&quot;BA Major Students - Thematic Sequence ISA2.xlsx&quot;</span>)</span>
+<span id="cb13-89"><a href="#cb13-89" aria-hidden="true" tabindex="-1"></a>thematic <span class="ot">&lt;-</span> thematic <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Student.ID =</span> <span class="st">`</span><span class="at">Student ID</span><span class="st">`</span>, <span class="at">Term.Code =</span> <span class="st">`</span><span class="at">Term Code</span><span class="st">`</span>, <span class="at">Thematic.Sequence.Title =</span> <span class="st">`</span><span class="at">Thematic Sequence Title</span><span class="st">`</span>)</span>
+<span id="cb13-90"><a href="#cb13-90" aria-hidden="true" tabindex="-1"></a>thematic <span class="ot">=</span> thematic <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Enrolled Student Count</span><span class="st">`</span>)</span>
+<span id="cb13-91"><a href="#cb13-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-92"><a href="#cb13-92" aria-hidden="true" tabindex="-1"></a>merged_data_1 <span class="ot">&lt;-</span> <span class="fu">merge</span>(merged_data, thematic, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-93"><a href="#cb13-93" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-94"><a href="#cb13-94" aria-hidden="true" tabindex="-1"></a><span class="fu">## Add Column for Students who dropped any business analytics program</span></span>
+<span id="cb13-95"><a href="#cb13-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-96"><a href="#cb13-96" aria-hidden="true" tabindex="-1"></a>Our goal is to understand a business analytics student&#39;s progression through their program and therefore we added a column titled flag to denote if they left their program or not. With this information, we can track what students leave which we will use in a predictive model as the target variable. </span>
+<span id="cb13-97"><a href="#cb13-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-98"><a href="#cb13-98" aria-hidden="true" tabindex="-1"></a>In order to correctly flag if someone dropped their business analytics program (Major, Minor, or Thematic), we grouped the student by their ID, and if they dropped their program, we dropped their most recent semester. This is because each student only has the semesters before/during their business analytics program and one semester after. Therefore, to predict why they may have dropped, we are not including the semester after they dropped their program.</span>
+<span id="cb13-99"><a href="#cb13-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-100"><a href="#cb13-100" aria-hidden="true" tabindex="-1"></a>Dropping this last semester in included in the table, merged_drop_last_2, and a column for flagged was added onto the merged_data table and called merged_with_flag_3. For reference, we also created a table of only students who flagged a 1, which means they dropped their program, to compare to the merged_data table and check for correctness. </span>
+<span id="cb13-103"><a href="#cb13-103" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-104"><a href="#cb13-104" aria-hidden="true" tabindex="-1"></a>merged_drop_last_2 <span class="ot">&lt;-</span> merged_data_1 <span class="sc">%&gt;%</span></span>
+<span id="cb13-105"><a href="#cb13-105" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Student.ID) <span class="sc">%&gt;%</span></span>
+<span id="cb13-106"><a href="#cb13-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(<span class="fu">last</span>(Major<span class="fl">.1</span> <span class="sc">!=</span> <span class="st">&#39;BA Major&#39;</span> <span class="sc">&amp;</span> Major<span class="fl">.2</span> <span class="sc">!=</span> <span class="st">&#39;BA Major&#39;</span> <span class="sc">&amp;</span> Major<span class="fl">.3</span> <span class="sc">!=</span> <span class="st">&#39;BA Major&#39;</span> <span class="sc">&amp;</span> Minor <span class="sc">!=</span> <span class="st">&#39;Business Analytics&#39;</span> <span class="sc">&amp;</span> Thematic.Sequence.Title <span class="sc">!=</span> <span class="st">&#39;ISA2 Applied Business Statistics&#39;</span>, <span class="at">order_by =</span> Term.Code) <span class="sc">&amp;</span> <span class="fu">row_number</span>() <span class="sc">==</span> <span class="fu">n</span>()))</span>
+<span id="cb13-107"><a href="#cb13-107" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-108"><a href="#cb13-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-111"><a href="#cb13-111" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-112"><a href="#cb13-112" aria-hidden="true" tabindex="-1"></a>merged_with_flag_3 <span class="ot">&lt;-</span> merged_drop_last_2 <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Student.ID) <span class="sc">%&gt;%</span> <span class="fu">mutate</span> (<span class="at">Flag =</span> <span class="fu">ifelse</span>(<span class="fu">n</span>() <span class="sc">&lt;</span> <span class="dv">8</span> <span class="sc">&amp;</span> <span class="fu">tail</span>(Term.Code, <span class="dv">1</span>) <span class="sc">!=</span> <span class="st">&#39;202410&#39;</span>, <span class="dv">1</span>,<span class="dv">0</span>)) <span class="sc">%&gt;%</span> <span class="fu">ungroup</span>()</span>
+<span id="cb13-113"><a href="#cb13-113" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-114"><a href="#cb13-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-117"><a href="#cb13-117" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-118"><a href="#cb13-118" aria-hidden="true" tabindex="-1"></a>flagged_true_4 <span class="ot">=</span> merged_with_flag_3 <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Flag <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb13-119"><a href="#cb13-119" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-120"><a href="#cb13-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-121"><a href="#cb13-121" aria-hidden="true" tabindex="-1"></a><span class="fu">## Adding Grade Information with Students by Term Code</span></span>
+<span id="cb13-122"><a href="#cb13-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-123"><a href="#cb13-123" aria-hidden="true" tabindex="-1"></a>To help predict if students dropped the program or not, we also included grade information for classes important to business analytics students. This includes a row for each the class the student took along with their StudentID, semester, and grade result. Unimportant columns were dropped, and other columns renamed to match previous tables. The grade data was merged into the merge_data file that was created above. </span>
+<span id="cb13-126"><a href="#cb13-126" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-127"><a href="#cb13-127" aria-hidden="true" tabindex="-1"></a>grades <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;Grades.csv&quot;</span>, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb13-128"><a href="#cb13-128" aria-hidden="true" tabindex="-1"></a>grades <span class="ot">=</span> grades <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">...1</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">GPA Quality Points</span><span class="st">`</span>, <span class="sc">-</span><span class="st">`</span><span class="at">Final Letter Grade</span><span class="st">`</span>)</span>
+<span id="cb13-129"><a href="#cb13-129" aria-hidden="true" tabindex="-1"></a>grades <span class="ot">&lt;-</span> grades <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Student.ID =</span> <span class="st">`</span><span class="at">Student ID</span><span class="st">`</span>, <span class="at">Term.Code =</span> <span class="st">`</span><span class="at">Term Code</span><span class="st">`</span>, <span class="st">`</span><span class="at">Final Letter Grade Group</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">Final Letter Grade Group</span><span class="st">`</span>)</span>
+<span id="cb13-130"><a href="#cb13-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-131"><a href="#cb13-131" aria-hidden="true" tabindex="-1"></a>merged_with_flag_and_grades <span class="ot">&lt;-</span> <span class="fu">merge</span>(merged_with_flag_3, grades, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;Student.ID&quot;</span>, <span class="st">&quot;Term.Code&quot;</span>), <span class="at">all.x =</span> <span class="cn">TRUE</span>, <span class="at">all.y =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-132"><a href="#cb13-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-133"><a href="#cb13-133" aria-hidden="true" tabindex="-1"></a>merged_with_flag_and_grades <span class="ot">&lt;-</span> merged_with_flag_and_grades <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">Cohort.Term =</span> <span class="st">`</span><span class="at">Cohort.Term.x</span><span class="st">`</span>)</span>
+<span id="cb13-134"><a href="#cb13-134" aria-hidden="true" tabindex="-1"></a>merged_with_flag_and_grades <span class="ot">=</span> merged_with_flag_and_grades <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">`</span><span class="at">Earned Academic Credit</span><span class="st">`</span>)</span>
+<span id="cb13-135"><a href="#cb13-135" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-136"><a href="#cb13-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-137"><a href="#cb13-137" aria-hidden="true" tabindex="-1"></a><span class="fu">## Export Files</span></span>
+<span id="cb13-138"><a href="#cb13-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-139"><a href="#cb13-139" aria-hidden="true" tabindex="-1"></a>We created two final tables. One tables is the merged student information with the flag denoting if they left the program or not. The second table is that same merged info with the flag along with student Grades. Both of these tables are exported to .csv files as &#39;StudentData&#39; and &#39;StudentData_withGrades, respectively. </span>
+<span id="cb13-142"><a href="#cb13-142" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-143"><a href="#cb13-143" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(merged_with_flag_and_grades, <span class="st">&#39;StudentData_withGrades&#39;</span>)</span>
+<span id="cb13-144"><a href="#cb13-144" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(merged_with_flag_3, <span class="at">file =</span> <span class="st">&#39;StudentData&#39;</span>)</span>
+<span id="cb13-145"><a href="#cb13-145" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
