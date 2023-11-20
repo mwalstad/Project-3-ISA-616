@@ -15,6 +15,9 @@ editor:
     wrap: 72
 ---
 
+## Session Information
+
+For the purpose of data reproducibility, we included the session info and loaded all required packages in this one location. 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -26,7 +29,9 @@ pacman::p_load(#DataExplorer, # For explorer and cleaning data by visualizing mi
                sjPlot, 
                corrplot, # for heatmaps
                DataExplorer, #for exploring data
-               skimr # for nice summary of data
+               skimr, # for nice summary of data
+               readxl,
+               dplyr
                ) # For creating dummy variables of categorical variables automatically.)
 ```
 
@@ -34,19 +39,39 @@ pacman::p_load(#DataExplorer, # For explorer and cleaning data by visualizing mi
 sessionInfo()
 ```
 
+## Time Series Analytis 
+
+### ISA2 Applied Business Statistics Thematic Sequence over Terms
 ```{r}
-# Install and load necessary packages
-install.packages("readxl")
-install.packages("dplyr")
-library(readxl)
-library(dplyr)
+data = read_excel("Thematic Sequence.xlsx")
+p = ggplot(data, aes(x = `Term Code`, y = `Enrolled Student Count`)) +
+  geom_bar(stat = "identity", color = "steelblue", fill = "steelblue", width = 0.8) +
+  xlab("Term Code") +
+  ylab("Enrolled Student Count") +
+  ggtitle("ISA2 Thematic Sequence Enrollment over Terms") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better visibility
+
+p
 ```
+### Business Analytics Minor over Terms
 
 ```{r}
-data = readRDS('Project3_StudentData')
-```
+data = read_excel("BA Minors.xlsx")
 
+p = ggplot(data, aes(x = `Term Code`, y = `Enrolled Student Count`)) +
+  geom_bar(stat = "identity", color = "steelblue", fill = "steelblue", width = 0.8) +
+  xlab("Term Code") +
+  ylab("Enrolled Student Count") +
+  ggtitle("Business Analytics Minor Enrollment over Terms") + 
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+p
+```
+### Business Analytics Major over Term
 ```{r}
 
 ```
+## Random Forest Model
 

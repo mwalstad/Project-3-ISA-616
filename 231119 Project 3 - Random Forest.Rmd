@@ -1,0 +1,179 @@
+---
+title: "Project 3 - Random Forest"
+author: "Max Lippman, Marti Walstad, Jenna Sayle, Alaina Edwards"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    toc-expand: true
+    code-tools: true 
+    code-fold: true
+    code-overflow: scroll
+    self-contained: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+## Session Information
+
+For the purpose of data reproducibility, we included the session info and loaded all required packages in this one location. 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if(require(pacman)==FALSE) install.packages("pacman")
+pacman::p_load(#DataExplorer, # For explorer and cleaning data by visualizing missing values.
+               gptstudio,#For coding assistance
+               httr, # For downloading the data from the UCI
+               tidyverse, # For data manipulation
+               sjPlot, 
+               corrplot, # for heatmaps
+               DataExplorer, #for exploring data
+               skimr, # for nice summary of data
+               readxl,
+               dplyr
+               ) # For creating dummy variables of categorical variables automatically.)
+```
+
+```{r}
+sessionInfo()
+```
+## Import Data
+
+```{r}
+
+df <- read_csv("StudentData_withGrades")
+
+df <- df %>% select(-Enrolled.Student.Count)
+
+df$Cohort.Term[is.na(df$Cohort.Term) | is.infinite(df$Cohort.Term) | is.infinite(-df$Cohort.Term)] <- 0
+
+df$Cohort.Term <- as.integer(df$Cohort.Term)
+df$Flag[is.na(df$Flag) | is.infinite(df$Flag) | is.infinite(-df$Flag)] <- 0
+df$Flag <- as.integer(df$Flag)
+
+```
+## Dummy Encoding
+
+```{r}
+df$is_BA_Major <- ifelse(
+  df$Major.1 == "BA Major" |
+  df$Major.2 == "BA Major" |
+  df$Major.3 == "BA Major",
+  1,
+  0
+)
+```
+
+```{r}
+df$is_BA_Thematic <- ifelse(df$Thematic.Sequence.Title == "ISA2 Applied Business Statistics", 1, 0)
+```
+
+```{r}
+df$is_BA_minor <- ifelse(df$Minor == "Business Analytics", 1, 0)
+
+```
+
+```{r}
+# Filter rows where Grade is 'A' and group by Student.ID to count occurrences
+df_grade_count <- table(df[df$`Final Letter Grade Group` == 'A', 'Student.ID'])
+
+# Create a new data frame with the count information
+df_grade_count <- data.frame(Student.ID = names(df_grade_count), A_Grade_Count = as.numeric(df_grade_count))
+
+# Merge the count back to the original DataFrame
+df <- merge(df, df_grade_count, by = 'Student.ID', all.x = TRUE)
+
+# Fill NA values in the new column with 0
+df$A_Grade_Count[is.na(df$A_Grade_Count)] <- 0
+```
+
+```{r}
+# Filter rows where Grade is 'B' and group by Student.ID to count occurrences
+df_grade_count <- table(df[df$`Final Letter Grade Group` == 'B', 'Student.ID'])
+
+# Create a new data frame with the count information
+df_grade_count <- data.frame(Student.ID = names(df_grade_count), B_Grade_Count = as.numeric(df_grade_count))
+
+# Merge the count back to the original DataFrame
+df <- merge(df, df_grade_count, by = 'Student.ID', all.x = TRUE)
+
+# Fill NA values in the new column with 0
+df$B_Grade_Count[is.na(df$B_Grade_Count)] <- 0
+```
+
+```{r}
+# Filter rows where Grade is 'C' and group by Student.ID to count occurrences
+df_grade_count <- table(df[df$`Final Letter Grade Group` == 'C', 'Student.ID'])
+
+# Create a new data frame with the count information
+df_grade_count <- data.frame(Student.ID = names(df_grade_count), C_Grade_Count = as.numeric(df_grade_count))
+
+# Merge the count back to the original DataFrame
+df <- merge(df, df_grade_count, by = 'Student.ID', all.x = TRUE)
+
+# Fill NA values in the new column with 0
+df$C_Grade_Count[is.na(df$C_Grade_Count)] <- 0
+```
+
+```{r}
+# Filter rows where Grade is 'D' and group by Student.ID to count occurrences
+df_grade_count <- table(df[df$`Final Letter Grade Group` == 'D', 'Student.ID'])
+
+# Create a new data frame with the count information
+df_grade_count <- data.frame(Student.ID = names(df_grade_count), D_Grade_Count = as.numeric(df_grade_count))
+
+# Merge the count back to the original DataFrame
+df <- merge(df, df_grade_count, by = 'Student.ID', all.x = TRUE)
+
+# Fill NA values in the new column with 0
+df$D_Grade_Count[is.na(df$D_Grade_Count)] <- 0
+```
+
+```{r}
+# Drop columns that are not needed
+columns_to_drop <- c('Major.1', 'Major.2', 'Major.3', 'Minor', 'Thematic.Sequence.Title')
+df <- df[, !(names(df) %in% columns_to_drop)]
+```
+
+```{r}
+# Group by 'Student.ID' and keep only the first row for each group
+Student_set <- df %>% group_by(Student.ID) %>% slice(1)
+```
+
+```{r}
+df <- na.omit(df)
+```
+
+```{r}
+install.packages("caTools")
+library(caTools)
+
+# Drop columns from X
+X <- df[, !(names(df) %in% c('Student.ID', 'Flag', 'Term.Code'))]
+
+# Extract the target variable
+y <- df$Flag
+
+# Set the random seed for reproducibility
+set.seed(591)
+
+##
+#split data !!!!!!
+```
+
+```{r}
+# Load the required library
+install.packages("randomForest")
+library(randomForest)
+
+# Instance of RandomForestClassifier
+rf <- randomForest(y_train ~ ., data = X_train, ntree = 120, proximity = TRUE, importance = TRUE)
+
+# Predict on the test set
+predictions <- predict(rf, X_test)
+
+# Calculate accuracy
+accuracy <- sum(predictions == y_test) / length(y_test)
+```
+
