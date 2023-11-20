@@ -73,5 +73,45 @@ p
 ```{r}
 
 ```
+### Count of Business Analytics Majors 
+
+```{r}
+ba_major_counts_by_term <- aggregate(Major.1 ~ Term.Code, data = merged_data, function(x) sum(x == "BA Major"))
+
+
+ba_major_counts_by_term2 <- aggregate(Major.2 ~ Term.Code, data = merged_data, function(x) sum(x == "BA Major"))
+
+ba_major_counts_by_term3 <- aggregate(Major.3 ~ Term.Code, data = merged_data, function(x) sum(x == "BA Major"))
+
+# Assuming ba_major_counts_by_term, ba_major_counts_by_term2, ba_major_counts_by_term3 are your data frames
+merged_counts <- merge(ba_major_counts_by_term, ba_major_counts_by_term2, by = "Term.Code", all = TRUE)
+merged_counts <- merge(merged_counts, ba_major_counts_by_term3, by = "Term.Code", all = TRUE)
+
+# Replace missing values with zeros
+merged_counts[is.na(merged_counts)] <- 0
+
+# Set column names for clarity
+names(merged_counts) <- c("Term.Code", "BA_Major_Count_1", "BA_Major_Count_2", "BA_Major_Count_3")
+
+# Display the result
+print(merged_counts)
+
+
+
+p <- ggplot(merged_counts, aes(x = Term.Code)) +
+  geom_bar(aes(y = BA_Major_Count_1), stat = "identity", position = "dodge", fill = "steelblue", color = "steelblue", width = 5) +
+  geom_bar(aes(y = BA_Major_Count_2), stat = "identity", position = "dodge", fill = "steelblue", color = "steelblue", width = 5) +
+  geom_bar(aes(y = BA_Major_Count_3), stat = "identity", position = "dodge", fill = "steelblue", color = "steelblue", width = 5) +
+  xlab("Term Code") +
+  ylab("BA Major Count") +
+  ggtitle("BA Major Counts by Term") +
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text = element_text(size = 8),  # Adjust the size of axis text
+        panel.grid.major.x = element_blank(),  # Hide major gridlines
+        panel.grid.minor.x = element_blank()) 
+
+print(p)
+```
 ## Random Forest Model
 
