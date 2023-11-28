@@ -1,0 +1,133 @@
+---
+title: "Project 3 - Data Cleaning"
+author: "Max Lippman, Marti Walstad, Jenna Sayle, Alaina Edwards"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    toc-expand: true
+    code-tools: true 
+    code-fold: true
+    code-overflow: scroll
+    self-contained: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+## Session Information
+
+For the purpose of data reproducibility, we included the session info and loaded all required packages in this one location. 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if(require(pacman)==FALSE) install.packages("pacman")
+pacman::p_load(#DataExplorer, # For explorer and cleaning data by visualizing missing values.
+               gptstudio,#For coding assistance
+               httr, # For downloading the data from the UCI
+               tidyverse, # For data manipulation
+               sjPlot, 
+               corrplot, # for heatmaps
+               DataExplorer, #for exploring data
+               skimr, # for nice summary of data
+               readxl,
+               dplyr
+               ) # For creating dummy variables of categorical variables automatically.)
+```
+
+```{r}
+sessionInfo()
+```
+
+## Import and Merge Files
+
+Here we imported files: Attributes, BA_Majors, BA Major Students - Minors, BA Major Students - Thematic Sequence ISA2. 
+
+* Attributes.csv: renamed to studentinfo, this file identifies an individual student in a business analytics program by a Student.ID and columns include student information including their gender, first generation status, cumulative GPA, and term code. Each student has a row for every term they have been enrolled. We dropped the index column called X
+
+* BA_Majors.csv: renamed to studentlist is similar to Attributes in which it identifies the student by Student.ID with a row for every term they have been enrolled at Miami. It also includes their cohort, and major (with a column for 3 potential majors. We dropped the index column called X and the Enrolled Student Count column because they were not important to our analysis.
+
+* BA Major Students - Minors.xlsx: This file was renamed to minors and includes a table of students who were classified as Business Analytics minors along with a row for each term they were enrolled at Miami. The table also includes a column for their cohort which is their freshman semester at Miami. We renamed columns to match the other tables with the same columns and dropped unnecessary columns like Enrolled Student Count. 
+
+* BA Major Students - Thematic Sequence ISA2.xlsx: Renamed to thematic, this table represents all of the students who had at one point been enrolled in the business analytics thematic sequence titled "ISA2 Applied Business Statistics". Like the other tables, this one includes Student.ID, Term.Code as well as the thematic sequence title.
+
+
+Each of these files loaded individually and merged into one common table on the Student.ID and Term.Code columns, and called merged_data. Repeated columns were dropped during this process so each row represents one term of enrollment for each student, and sequential information about the student during that sememster. 
+```{r}
+# Read in Attributes File and drop column
+studentinfo <- read.csv("Attributes.csv")
+studentinfo = studentinfo %>% select(-`X`)
+
+## Read in BA_Majors.csv and drop column
+studentlist <- read.csv("BA_Majors.csv")
+studentlist = studentlist %>% select(-`X`)
+
+# Combine the two data frames
+merged_data <- merge(studentinfo, studentlist, by = c("Student.ID", "Term.Code"))
+```
+
+```{r}
+minors <- read_excel("BA Major Students - Minors.xlsx")
+minors <- minors %>% rename(Student.ID = `Student ID`, Term.Code = `Term Code`, Cohort.Term = `Cohort Term`)
+minors = minors %>% select(-`Enrolled Student Count`)
+
+merged_data <- merge(merged_data, minors, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
+merged_data = merged_data %>% select(-`Cohort.Term.y`)
+
+```
+
+```{r}
+thematic <- read_excel("BA Major Students - Thematic Sequence ISA2.xlsx")
+thematic <- thematic %>% rename(Student.ID = `Student ID`, Term.Code = `Term Code`, Thematic.Sequence.Title = `Thematic Sequence Title`)
+thematic = thematic %>% select(-`Enrolled Student Count`)
+
+merged_data_1 <- merge(merged_data, thematic, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
+```
+## Add Column for Students who dropped any business analytics program
+
+Our goal is to understand a business analytics student's progression through their program and therefore we added a column titled flag to denote if they left their program or not. With this information, we can track what students leave which we will use in a predictive model as the target variable. 
+
+In order to correctly flag if someone dropped their business analytics program (Major, Minor, or Thematic), we grouped the student by their ID, and if they dropped their program, we dropped their most recent semester. This is because each student only has the semesters before/during their business analytics program and one semester after. Therefore, to predict why they may have dropped, we are not including the semester after they dropped their program.
+
+Dropping this last semester in included in the table, merged_drop_last_2, and a column for flagged was added onto the merged_data table and called merged_with_flag_3. For reference, we also created a table of only students who flagged a 1, which means they dropped their program, to compare to the merged_data table and check for correctness. 
+```{r}
+merged_drop_last_2 <- merged_data_1 %>%
+  group_by(Student.ID) %>%
+  filter(!(last(Major.1 != 'BA Major' & Major.2 != 'BA Major' & Major.3 != 'BA Major' & Minor != 'Business Analytics' & Thematic.Sequence.Title != 'ISA2 Applied Business Statistics', order_by = Term.Code) & row_number() == n()))
+```
+
+```{r}
+merged_with_flag_3 <- merged_drop_last_2 %>% group_by(Student.ID) %>% mutate (Flag = ifelse(n() < 8 & tail(Term.Code, 1) != '202410', 1,0)) %>% ungroup()
+```
+
+```{r}
+flagged_true_4 = merged_with_flag_3 %>% filter(Flag == 1)
+```
+
+## Adding Grade Information with Students by Term Code
+
+To help predict if students dropped the program or not, we also included grade information for classes important to business analytics students. This includes a row for each the class the student took along with their StudentID, semester, and grade result. Unimportant columns were dropped, and other columns renamed to match previous tables. The grade data was merged into the merge_data file that was created above. 
+```{r} 
+grades <- read_csv("Grades.csv", show_col_types = FALSE)
+grades = grades %>% select(-`...1`, -`GPA Quality Points`, -`Final Letter Grade`)
+grades <- grades %>% rename(Student.ID = `Student ID`, Term.Code = `Term Code`, `Final Letter Grade Group` = `Final Letter Grade Group`)
+
+merged_with_flag_and_grades <- merge(merged_with_flag_3, grades, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
+
+merged_with_flag_and_grades <- merged_with_flag_and_grades %>% rename(Cohort.Term = `Cohort.Term.x`)
+merged_with_flag_and_grades = merged_with_flag_and_grades %>% select(-`Earned Academic Credit`)
+```
+
+## Export Files
+
+We created two final files One tables is the merged student information with the flag denoting if they left the program and their grades. The other file is the same information without a flag to use in our predictive model. Both of these tables are exported to .csv files as  'StudentData_withGrades" and 'StudentData_NoFlag', respectively. 
+
+```{r}
+no_flag = merged_with_flag_and_grades %>% select(-`Flag`)
+```
+
+```{r}
+write.csv(merged_with_flag_and_grades, 'StudentData_withGrades')
+write.csv(no_flag, 'StudentData_NoFlag')
+```
+
