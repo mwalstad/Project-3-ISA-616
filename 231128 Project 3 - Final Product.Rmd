@@ -14,11 +14,30 @@ editor:
   markdown: 
     wrap: 72
 ---
+
 # Introduction
 
-There is difficulty forecasting the number of students in a Business Analytics program resulting in challenges with class size planning. We look to answer these questions: (1) Historically, what characteristics define students who stay with a Business Analytics program? (2) Is there a pattern to the number of students staying or leaving a Business Analytics program? (3) What courses have a significant impact on whether students stay with the business analytics major?
+There is difficulty forecasting the number of students in a Business
+Analytics program resulting in challenges with class size planning. We
+look to answer these questions: (1) Historically, what characteristics
+define students who stay with a Business Analytics program? (2) Is there
+a pattern to the number of students staying or leaving a Business
+Analytics program? (3) What courses have a significant impact on whether
+students stay with the business analytics major?
 
-In this document, we analyzed data from Miami University’s Farmer School of Business student data from fall 2018 to fall 2023 school years, provided by clients Alan Clift and Skip Benamati. This data included students who were enrolled in any Business Analytics program during their time at Miami. Programs include the Business Analytics Major, Minor, and ISA2 thematic sequence. We used a random forest model to predict whether a student enrolled in the Business Analytics program would eventually drop based on the features of our model.  We used a binary “flagging” target variable (column with 1 or 0) to denote if they left their program or not (1= leave, 0 = stay) at any time. Furthermore, we utilized portions of the student data, organized by program type, to conduct descriptive analysis on trends related to enrollment to support our analysis of answering the research questions above.
+In this document, we analyzed data from Miami University's Farmer School
+of Business student data from fall 2018 to fall 2023 school years,
+provided by clients Alan Clift and Skip Benamati. This data included
+students who were enrolled in any Business Analytics program during
+their time at Miami. Programs include the Business Analytics Major,
+Minor, and ISA2 thematic sequence. We used a random forest model to
+predict whether a student enrolled in the Business Analytics program
+would eventually drop based on the features of our model. We used a
+binary "flagging" target variable (column with 1 or 0) to denote if they
+left their program or not (1= leave, 0 = stay) at any time. Furthermore,
+we utilized portions of the student data, organized by program type, to
+conduct descriptive analysis on trends related to enrollment to support
+our analysis of answering the research questions above.
 
 ### Business Value Propositions
 
@@ -28,7 +47,7 @@ Client:
 
 -   Skip Benamati Professor and chair of the Information Systems &
     Analytics along with his staff including Alan Clift (Data and
-    planning Analyst) and Professor, Alison Jones-Farmer. 
+    planning Analyst) and Professor, Alison Jones-Farmer.
 
 Jobs:
 
@@ -59,7 +78,9 @@ Pains:
 
 Solution:
 
--   Time series analysis and prediction of future enrollment for the next two semesters. A predictive model to determine is a student will drop or stay in their program. 
+-   Time series analysis and prediction of future enrollment for the
+    next two semesters. A predictive model to determine is a student
+    will drop or stay in their program.
 
 Pain Killers:
 
@@ -86,12 +107,13 @@ Gain Creators:
 
 -   Resources for advising that help identify prospective BA students
 
-
 # Data Cleaning and Preparation
 
 ## Session Information
 
-For the purpose of data reproducibility, we included the session info and loaded all required packages in this one location. 
+For the purpose of data reproducibility, we included the session info
+and loaded all required packages in this one location.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
@@ -115,18 +137,49 @@ sessionInfo()
 
 ## Import and Merge Files
 
-Here we imported files: Attributes, BA_Majors, BA Major Students - Minors, BA Major Students - Thematic Sequence ISA2. 
+Here we imported files: Attributes, BA_Majors, BA Major Students -
+Minors, BA Major Students - Thematic Sequence ISA2.
 
-* Attributes.csv: renamed to studentinfo, this file identifies an individual student in a business analytics program by a Student.ID and columns include student information including their gender, first generation status, cumulative GPA, and term code. Each student has a row for every term they have been enrolled. We dropped the index column called X
+-   Attributes.csv: renamed to studentinfo, this file identifies an
+    individual student in a business analytics program by a Student.ID
+    and columns include student information including their gender,
+    first generation status, cumulative GPA, and term code. Each student
+    has a row for every term they have been enrolled. We dropped the
+    index column called X
 
-* BA_Majors.csv: renamed to studentlist is similar to Attributes in which it identifies the student by Student.ID with a row for every term they have been enrolled at Miami. It also includes their cohort, and major (with a column for 3 potential majors. We dropped the index column called X and the Enrolled Student Count column because they were not important to our analysis.
+-   BA_Majors.csv: renamed to studentlist is similar to Attributes in
+    which it identifies the student by Student.ID with a row for every
+    term they have been enrolled at Miami. It also includes their
+    cohort, and major (with a column for 3 potential majors. We dropped
+    the index column called X and the Enrolled Student Count column
+    because they were not important to our analysis.
 
-* BA Major Students - Minors.xlsx: This file was renamed to minors and includes a table of students who were classified as Business Analytics minors along with a row for each term they were enrolled at Miami. It was given to us as in the raw data folder and we had to unmerge and populate cells to use it as a table in our analysis. The file included the count of enrolled students by term which we displayed as a bar graph.The table also includes a column for their cohort which is their freshman semester at Miami. We renamed columns to match the other tables with the same columns and dropped unnecessary columns like Enrolled Student Count. 
+-   BA Major Students - Minors.xlsx: This file was renamed to minors and
+    includes a table of students who were classified as Business
+    Analytics minors along with a row for each term they were enrolled
+    at Miami. It was given to us as in the raw data folder and we had to
+    unmerge and populate cells to use it as a table in our analysis. The
+    file included the count of enrolled students by term which we
+    displayed as a bar graph.The table also includes a column for their
+    cohort which is their freshman semester at Miami. We renamed columns
+    to match the other tables with the same columns and dropped
+    unnecessary columns like Enrolled Student Count.
 
-* BA Major Students - Thematic Sequence ISA2.xlsx: Renamed to thematic, this table represents all of the students who had at one point been enrolled in the business analytics thematic sequence titled "ISA2 Applied Business Statistics".  It was given to us as in the raw data folder and we had to unmerge and populate cells to use it as a table in our analysis. Like the other tables, this one includes Student.ID, Term.Code as well as the thematic sequence title.
+-   BA Major Students - Thematic Sequence ISA2.xlsx: Renamed to
+    thematic, this table represents all of the students who had at one
+    point been enrolled in the business analytics thematic sequence
+    titled "ISA2 Applied Business Statistics". It was given to us as in
+    the raw data folder and we had to unmerge and populate cells to use
+    it as a table in our analysis. Like the other tables, this one
+    includes Student.ID, Term.Code as well as the thematic sequence
+    title.
 
+Each of these files loaded individually and merged into one common table
+on the Student.ID and Term.Code columns, and called merged_data.
+Repeated columns were dropped during this process so each row represents
+one term of enrollment for each student, and sequential information
+about the student during that sememster.
 
-Each of these files loaded individually and merged into one common table on the Student.ID and Term.Code columns, and called merged_data. Repeated columns were dropped during this process so each row represents one term of enrollment for each student, and sequential information about the student during that sememster. 
 ```{r}
 # Read in Attributes File and drop column
 studentinfo <- read.csv("Attributes.csv")
@@ -157,13 +210,29 @@ thematic = thematic %>% select(-`Enrolled Student Count`)
 
 merged_data_1 <- merge(merged_data, thematic, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
 ```
+
 ## Add Column for Students who dropped any Business Analytics program
 
-Our goal is to understand a business analytics student's progression through their program and therefore we added a column titled flag to denote if they left their program or not. With this information, we can track what students leave which we will use in a predictive model as the target variable. 
+Our goal is to understand a business analytics student's progression
+through their program and therefore we added a column titled flag to
+denote if they left their program or not. With this information, we can
+track what students leave which we will use in a predictive model as the
+target variable.
 
-In order to correctly flag if someone dropped their business analytics program (Major, Minor, or Thematic), we grouped the student by their ID, and if they dropped their program, we dropped their most recent semester. This is because each student only has the semesters before/during their business analytics program and one semester after. Therefore, to predict why they may have dropped, we are not including the semester after they dropped their program.
+In order to correctly flag if someone dropped their business analytics
+program (Major, Minor, or Thematic), we grouped the student by their ID,
+and if they dropped their program, we dropped their most recent
+semester. This is because each student only has the semesters
+before/during their business analytics program and one semester after.
+Therefore, to predict why they may have dropped, we are not including
+the semester after they dropped their program.
 
-Dropping this last semester in included in the table, merged_drop_last_2, and a column for flagged was added onto the merged_data table and called merged_with_flag_3. For reference, we also created a table of only students who flagged a 1, which means they dropped their program, to compare to the merged_data table and check for correctness. 
+Dropping this last semester in included in the table,
+merged_drop_last_2, and a column for flagged was added onto the
+merged_data table and called merged_with_flag_3. For reference, we also
+created a table of only students who flagged a 1, which means they
+dropped their program, to compare to the merged_data table and check for
+correctness.
 
 ```{r}
 merged_drop_last_2 <- merged_data_1 %>%
@@ -181,8 +250,14 @@ flagged_true_4 = merged_with_flag_3 %>% filter(Flag == 1)
 
 ## Adding Grade Information with Students by Term Code
 
-To help predict if students dropped the program or not, we also included grade information for classes important to business analytics students. This includes a row for each the class the student took along with their StudentID, semester, and grade result. Unimportant columns were dropped, and other columns renamed to match previous tables. The grade data was merged into the merge_data file that was created above. 
-```{r} 
+To help predict if students dropped the program or not, we also included
+grade information for classes important to business analytics students.
+This includes a row for each the class the student took along with their
+StudentID, semester, and grade result. Unimportant columns were dropped,
+and other columns renamed to match previous tables. The grade data was
+merged into the merge_data file that was created above.
+
+```{r}
 grades <- read_csv("Grades.csv", show_col_types = FALSE)
 grades = grades %>% select(-`...1`, -`GPA Quality Points`, -`Final Letter Grade`)
 grades <- grades %>% rename(Student.ID = `Student ID`, Term.Code = `Term Code`, `Final Letter Grade Group` = `Final Letter Grade Group`)
@@ -193,9 +268,13 @@ merged_with_flag_and_grades <- merged_with_flag_and_grades %>% rename(Cohort.Ter
 merged_with_flag_and_grades = merged_with_flag_and_grades %>% select(-`Earned Academic Credit`)
 ```
 
-## Export Files 
+## Export Files
 
-We created two final files One tables is the merged student information with the flag denoting if they left the program and their grades. The other file is the same information without a flag to use in our predictive model. Both of these tables are exported to .csv files as  'StudentData_withGrades" and 'StudentData_NoFlag', respectively. 
+We created two final files One tables is the merged student information
+with the flag denoting if they left the program and their grades. The
+other file is the same information without a flag to use in our
+predictive model. Both of these tables are exported to .csv files as
+'StudentData_withGrades" and 'StudentData_NoFlag', respectively.
 
 ```{r}
 no_flag = merged_with_flag_and_grades %>% select(-`Flag`)
@@ -208,11 +287,34 @@ write.csv(no_flag, 'StudentData_NoFlag')
 
 # Time Series Analysis
 
-The following charts are the distinct counts of students enrolled in each business analytics programs. Programs include the Business Analytics Major, Minor, and thematic sequenced (named Applied Business Statistics). Each program is plotted individually over term from fall 2018 to fall 2024. We intend on adding to each bar chart the % growth each semester and a line of best fit. Plotting the line of best fit will return a prediction for a future semester.We also intend on continuing to improve the aesthetics and understandably of each graph with better labeling and spacing. 
+The following charts are the distinct counts of students enrolled in
+each business analytics programs. Programs include the Business
+Analytics Major, Minor, and thematic sequenced (named Applied Business
+Statistics). Each program is plotted individually over term from fall
+2018 to fall 2024. We intend on adding to each bar chart the % growth
+each semester and a line of best fit. Plotting the line of best fit will
+return a prediction for a future semester.We also intend on continuing
+to improve the aesthetics and understandably of each graph with better
+labeling and spacing.
 
 ## ISA2 Applied Business Statistics Thematic Sequence Enrollment by Term
 
-Using the data from the file, 'Thematic Sequence.xlsx', we were able to graph the number of students enrolled in the ISA2 Applied Business Statistics Thematic Sequence. The file included the count of enrolled students by term which we displayed as a bar graph. Using this visual, we can predict the next two semesters, 202420 and 202510, with a naive forecast. Starting in spring 2020 (noted as 202020 as the term code), there was a significant decrease in the number of students enrolled in this program. After that point, the enrollment stayed consistently between 40-50. There are about 10 more students enrolled in the spring of every semester than the fall for every academic year that the data includes. Therefore, following the same pattern, we used a naive forecast to project the next two semesters with the expected count for 202420 to be 52 enrolled students and 41 in 202510. These are the same numbers from the same time, previous year and also falls the pattern from the last 8 semesters.  The two projections were added to the bar chart and denoted in orange as forecasted values. 
+Using the data from the file, 'Thematic Sequence.xlsx', we were able to
+graph the number of students enrolled in the ISA2 Applied Business
+Statistics Thematic Sequence. The file included the count of enrolled
+students by term which we displayed as a bar graph. Using this visual,
+we can predict the next two semesters, 202420 and 202510, with a naive
+forecast. Starting in spring 2020 (noted as 202020 as the term code),
+there was a significant decrease in the number of students enrolled in
+this program. After that point, the enrollment stayed consistently
+between 40-50. There are about 10 more students enrolled in the spring
+of every semester than the fall for every academic year that the data
+includes. Therefore, following the same pattern, we used a naive
+forecast to project the next two semesters with the expected count for
+202420 to be 52 enrolled students and 41 in 202510. These are the same
+numbers from the same time, previous year and also falls the pattern
+from the last 8 semesters. The two projections were added to the bar
+chart and denoted in orange as forecasted values.
 
 ```{r}
 data = read_excel("Thematic Sequence.xlsx")
@@ -244,7 +346,20 @@ p
 
 ## Business Analytics Minor Enrollment by Term
 
-Using the data from the file, 'BA Minors.xlsx', we were able to graph the number of students enrolled in the Business Analytics minor. The file included the count of enrolled students by term which we displayed as a bar graph. Using this visual, we predicted the next two semesters, 202420 and 202510, with a naive forecast. The most recent four semesters (202220 through 202410) were consistent in enrollments and similar to the thematic sequence, following the pattern that the fall semester had fewer enrolled than the spring semester of that academic year. Therefore, to continue the same pattern, we averaged the previous two spring semesters to project the 202420 term and continued this to get a projection for the fall 2025 term. The two projections, which are both simple averages, were added to the bar chart and denoted in orange as forecasted values. 
+Using the data from the file, 'BA Minors.xlsx', we were able to graph
+the number of students enrolled in the Business Analytics minor. The
+file included the count of enrolled students by term which we displayed
+as a bar graph. Using this visual, we predicted the next two semesters,
+202420 and 202510, with a naive forecast. The most recent four semesters
+(202220 through 202410) were consistent in enrollments and similar to
+the thematic sequence, following the pattern that the fall semester had
+fewer enrolled than the spring semester of that academic year.
+Therefore, to continue the same pattern, we averaged the previous two
+spring semesters to project the 202420 term and continued this to get a
+projection for the fall 2025 term. The two projections, which are both
+simple averages, were added to the bar chart and denoted in orange as
+forecasted values.
+
 ```{r}
 data = read_excel("BA Minors.xlsx")
 
@@ -273,7 +388,15 @@ p
 
 ## Business Analytics Major Enrollment by Term
 
-We conducted a time series analysis on the business analytics major enrollment by term to project the next two semesters of enrollment. We used our merged data frame that was created with four student data files before adding student grade information and displays student information by term. This data frame includes student information for any students in a business analytics program. Therefore, we created a count of students grouped by term, who noted Business Analytics as their major in columns Major.1, Major.2, and Major.3. From there we displayed the student enrollment over academic terms. 
+We conducted a time series analysis on the business analytics major
+enrollment by term to project the next two semesters of enrollment. We
+used our merged data frame that was created with four student data files
+before adding student grade information and displays student information
+by term. This data frame includes student information for any students
+in a business analytics program. Therefore, we created a count of
+students grouped by term, who noted Business Analytics as their major in
+columns Major.1, Major.2, and Major.3. From there we displayed the
+student enrollment over academic terms.
 
 ```{r}
 merged_data = merged_data
@@ -332,10 +455,51 @@ p
 ## 21.5% change between 2023 and 2024
 ## 36.5% average between those two growth rates
 ```
-The pattern of the previous two years helped us project the coming two semesters. For spring 2024, the graph shows that the fall and spring enrollment are very similar. We used a naive forecast for 202420 to continue this pattern determining that the projected enrollment in the spring should be the same as the fall semester, 356 students. For the fall semester 2025, we used a simple average of the growth rate between previous two academic years to project the growth needed to calculate the 202510 forecast. There was a 51.5% growth between 202220 and 202310 enrollment. Between 202320 and 202410, there was a 21.5% growth. Averaging these two growth rates gets 36.5% growth from 202420 to 202510, or 430 students. The two projected enrollments are notes in the bar chart in orange. 
+
+The pattern of the previous two years helped us project the coming two
+semesters. For spring 2024, the graph shows that the fall and spring
+enrollment are very similar. We used a naive forecast for 202420 to
+continue this pattern determining that the projected enrollment in the
+spring should be the same as the fall semester, 356 students. For the
+fall semester 2025, we used a simple average of the growth rate between
+previous two academic years to project the growth needed to calculate
+the 202510 forecast. There was a 51.5% growth between 202220 and 202310
+enrollment. Between 202320 and 202410, there was a 21.5% growth.
+Averaging these two growth rates gets 36.5% growth from 202420 to
+202510, or 430 students. The two projected enrollments are notes in the
+bar chart in orange.
 
 # Predictive Model - XGBoost Classifier
 
-Our goal is to understand a business analytics student's progression through their program and therefore we added a flag (column with 1 or 0) to denote if they left their program or not (1= leave, 0 = stay) at anytime. With this information, we can track what students leave which we used in a predictive model as the target variable. 
+### **Model Overview:**
 
+Our goal is to understand a business analytics student's progression
+through their program and therefore we added a flag (column with 1 or 0)
+to denote if they left their program or not (1= leave, 0 = stay) at
+anytime. With this information, we can track what students leave which
+we used in a predictive model as the target variable.
 
+[Link to trained model](616model.html){:target="\_blank"}
+
+inert Explanation of Model here
+
+### **Evaluation Metrics:**
+
+Test Classification Report:
+
+![](model_classification_report.png)
+
+Confusion Matrix:
+
+![](Model_confusion_matrix.png)
+
+ROC Curve
+
+![](model_ROC_curve_AUC_score.png)
+
+### **Implementation**
+
+insert explanation here
+
+[Link to implementation
+guide](616implementation.html){:target="\_blank"}

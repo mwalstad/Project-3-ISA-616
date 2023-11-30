@@ -133,11 +133,15 @@ In this document, we analyzed data from Miami University’s Farmer School of Bu
 10. StudentData_noFlag: Cleaned data file created by combining input files without the Flag variable. Used to test the predicitve model. 
 11. Project3-Final.rmd: Complete R-markdown file including Introduction, Research Questions, BVP, Cleaning Process, Descriptive Analysis, and Links to Predictive Model file. 
 12. Project3-Final.html: RMD file converted to HTML
-13. Predictive Model File: Created in Google Colab and exported to HTML. Links from Project3-Final connect here. Implements the predictive model. 
-14. BVP image
-15. ROC cuve image
-16. Confusion Matrix image
-17. Classification Report image
+13. 616Model.ipynb: Created in Google Colab and exported to HTML. Links from Project3-Final connect here. Trains the predictive model. 
+14. 616Model.html: File converted from .ipynb to HTML
+15. 616Implementation.ipynb: Created in Google Colab and exported to HTML. Links from Project3-Final connect here. Implements the predictive model. 
+16. 616Implementation.html: File converted from .ipynb to HTML
+17. BVPgroup8.png: business value proposition diagram 
+18. model_ROC_curve_AUC_score.png: ROC cuve image from trained model results
+19. Model_confusion_matrix.png: Confusion Matrix image from trained model results
+20. model_classifiction_report.png: Classification Report image from trained model results
+21. model_feature_importance.png: image of feature importances as a bar chart. 
 
 
 ## Final Deliverable
