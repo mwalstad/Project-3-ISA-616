@@ -1,5 +1,5 @@
 ---
-title: "Project 3 - Data Cleaning"
+title: "Staying the Course: Factors Influencing Business Analytics Retention"
 author: "Max Lippman, Marti Walstad, Jenna Sayle, Alaina Edwards"
 format: 
   html:
@@ -14,6 +14,80 @@ editor:
   markdown: 
     wrap: 72
 ---
+# Introduction
+
+There is difficulty forecasting the number of students in a Business Analytics program resulting in challenges with class size planning. We look to answer these questions: (1) Historically, what characteristics define students who stay with a Business Analytics program? (2) Is there a pattern to the number of students staying or leaving a Business Analytics program? (3) What courses have a significant impact on whether students stay with the business analytics major?
+
+In this document, we analyzed data from Miami University’s Farmer School of Business student data from fall 2018 to fall 2023 school years, provided by clients Alan Clift and Skip Benamati. This data included students who were enrolled in any Business Analytics program during their time at Miami. Programs include the Business Analytics Major, Minor, and ISA2 thematic sequence. We used a random forest model to predict whether a student enrolled in the Business Analytics program would eventually drop based on the features of our model.  We used a binary “flagging” target variable (column with 1 or 0) to denote if they left their program or not (1= leave, 0 = stay) at any time. Furthermore, we utilized portions of the student data, organized by program type, to conduct descriptive analysis on trends related to enrollment to support our analysis of answering the research questions above.
+
+### Business Value Propositions
+
+![](BVP_group8.png)
+
+Client:
+
+-   Skip Benamati Professor and chair of the Information Systems &
+    Analytics along with his staff including Alan Clift (Data and
+    planning Analyst) and Professor, Alison Jones-Farmer. 
+
+Jobs:
+
+-   Accurately predict demand for classes
+
+-   Understand the flow of students in and out of Business Analytics
+    major
+
+Pains:
+
+-   Before:
+
+    -   Abundance of BA majors who end up dropping
+
+-   During:
+
+    -   Student retention -- understanding characteristics of students
+        who stay and do not stay with the BA major
+
+    -   Understanding what students are switching to the BA major
+
+    -   If BA courses have an impact on whether students stay in
+        business analytics
+
+-   After:
+
+    -   Over offering classes (results in too many small sized classes)
+
+Solution:
+
+-   Time series analysis and prediction of future enrollment for the next two semesters. A predictive model to determine is a student will drop or stay in their program. 
+
+Pain Killers:
+
+-   Identify key characteristics of students who leave the major
+
+-   Identify classes that may need curriculum change in order to retain
+    my students
+
+-   Understand why students switch to the BA major and what majors they
+    come from
+
+Gains:
+
+-   Confidence promoting program
+
+-   Pipeline of students from advising
+
+-   Use for other majors (ISA)
+
+Gain Creators:
+
+-   Advice tailored to the results on how to better market the BA
+    program
+
+-   Resources for advising that help identify prospective BA students
+
+
+# Data Cleaning and Preparation
 
 ## Session Information
 
@@ -83,13 +157,14 @@ thematic = thematic %>% select(-`Enrolled Student Count`)
 
 merged_data_1 <- merge(merged_data, thematic, by = c("Student.ID", "Term.Code"), all.x = TRUE, all.y = TRUE)
 ```
-## Add Column for Students who dropped any business analytics program
+## Add Column for Students who dropped any Business Analytics program
 
 Our goal is to understand a business analytics student's progression through their program and therefore we added a column titled flag to denote if they left their program or not. With this information, we can track what students leave which we will use in a predictive model as the target variable. 
 
 In order to correctly flag if someone dropped their business analytics program (Major, Minor, or Thematic), we grouped the student by their ID, and if they dropped their program, we dropped their most recent semester. This is because each student only has the semesters before/during their business analytics program and one semester after. Therefore, to predict why they may have dropped, we are not including the semester after they dropped their program.
 
 Dropping this last semester in included in the table, merged_drop_last_2, and a column for flagged was added onto the merged_data table and called merged_with_flag_3. For reference, we also created a table of only students who flagged a 1, which means they dropped their program, to compare to the merged_data table and check for correctness. 
+
 ```{r}
 merged_drop_last_2 <- merged_data_1 %>%
   group_by(Student.ID) %>%
@@ -118,7 +193,7 @@ merged_with_flag_and_grades <- merged_with_flag_and_grades %>% rename(Cohort.Ter
 merged_with_flag_and_grades = merged_with_flag_and_grades %>% select(-`Earned Academic Credit`)
 ```
 
-## Export Files
+## Export Files 
 
 We created two final files One tables is the merged student information with the flag denoting if they left the program and their grades. The other file is the same information without a flag to use in our predictive model. Both of these tables are exported to .csv files as  'StudentData_withGrades" and 'StudentData_NoFlag', respectively. 
 
@@ -130,4 +205,137 @@ no_flag = merged_with_flag_and_grades %>% select(-`Flag`)
 write.csv(merged_with_flag_and_grades, 'StudentData_withGrades')
 write.csv(no_flag, 'StudentData_NoFlag')
 ```
+
+# Time Series Analysis
+
+The following charts are the distinct counts of students enrolled in each business analytics programs. Programs include the Business Analytics Major, Minor, and thematic sequenced (named Applied Business Statistics). Each program is plotted individually over term from fall 2018 to fall 2024. We intend on adding to each bar chart the % growth each semester and a line of best fit. Plotting the line of best fit will return a prediction for a future semester.We also intend on continuing to improve the aesthetics and understandably of each graph with better labeling and spacing. 
+
+## ISA2 Applied Business Statistics Thematic Sequence Enrollment by Term
+
+Using the data from the file, 'Thematic Sequence.xlsx', we were able to graph the number of students enrolled in the ISA2 Applied Business Statistics Thematic Sequence. The file included the count of enrolled students by term which we displayed as a bar graph. Using this visual, we can predict the next two semesters, 202420 and 202510, with a naive forecast. Starting in spring 2020 (noted as 202020 as the term code), there was a significant decrease in the number of students enrolled in this program. After that point, the enrollment stayed consistently between 40-50. There are about 10 more students enrolled in the spring of every semester than the fall for every academic year that the data includes. Therefore, following the same pattern, we used a naive forecast to project the next two semesters with the expected count for 202420 to be 52 enrolled students and 41 in 202510. These are the same numbers from the same time, previous year and also falls the pattern from the last 8 semesters.  The two projections were added to the bar chart and denoted in orange as forecasted values. 
+
+```{r}
+data = read_excel("Thematic Sequence.xlsx")
+
+colnames(data) <- c("Term.Code", "Enrolled.Student.Count")
+
+new_data <- data.frame(
+  Term.Code = c(202420, 202510),
+  Enrolled.Student.Count = c(52, 41))
+
+new <- rbind(data, new_data)
+```
+
+```{r}
+p <- ggplot(new, aes(x = `Term.Code`, y = `Enrolled.Student.Count`, fill = factor(`Term.Code`))) +
+  geom_bar(stat = "identity", color = "steelblue", width = 0.8) +
+  xlab("Term.Code") +
+  ylab("Enrolled.Student.Count") +
+  ggtitle("ISA2 Thematic Sequence Enrollment over Terms") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  geom_text(aes(label = `Enrolled.Student.Count`), vjust = -0.5, color = "black", size = 3) +
+  coord_cartesian(ylim = c(0, 300)) +
+  scale_fill_manual(values = c(rep("steelblue", nrow(new) - 2), "orange", "orange"))+
+   guides(fill = FALSE)
+
+p
+```
+
+## Business Analytics Minor Enrollment by Term
+
+Using the data from the file, 'BA Minors.xlsx', we were able to graph the number of students enrolled in the Business Analytics minor. The file included the count of enrolled students by term which we displayed as a bar graph. Using this visual, we predicted the next two semesters, 202420 and 202510, with a naive forecast. The most recent four semesters (202220 through 202410) were consistent in enrollments and similar to the thematic sequence, following the pattern that the fall semester had fewer enrolled than the spring semester of that academic year. Therefore, to continue the same pattern, we averaged the previous two spring semesters to project the 202420 term and continued this to get a projection for the fall 2025 term. The two projections, which are both simple averages, were added to the bar chart and denoted in orange as forecasted values. 
+```{r}
+data = read_excel("BA Minors.xlsx")
+
+colnames(data) <- c("Term.Code", "Enrolled.Student.Count")
+
+new_data <- data.frame(
+  Term.Code = c(202420, 202510),
+  Enrolled.Student.Count = c(185, 147))
+
+new <- rbind(data, new_data)
+
+p <- ggplot(new, aes(x = `Term.Code`, y = `Enrolled.Student.Count`, fill = factor(`Term.Code`))) +
+  geom_bar(stat = "identity", color = "steelblue", width = 0.8) +
+  xlab("Term Code") +
+  ylab("Enrolled Student Count") +
+  ggtitle("Business Analytics Minor Over Terms") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  geom_text(aes(label = `Enrolled.Student.Count`), vjust = -0.5, color = "black", size = 3) +
+  coord_cartesian(ylim = c(0, 300)) +
+  scale_fill_manual(values = c(rep("steelblue", nrow(new) - 2), "orange", "orange"))+
+   guides(fill = FALSE)
+
+p
+```
+
+## Business Analytics Major Enrollment by Term
+
+We conducted a time series analysis on the business analytics major enrollment by term to project the next two semesters of enrollment. We used our merged data frame that was created with four student data files before adding student grade information and displays student information by term. This data frame includes student information for any students in a business analytics program. Therefore, we created a count of students grouped by term, who noted Business Analytics as their major in columns Major.1, Major.2, and Major.3. From there we displayed the student enrollment over academic terms. 
+
+```{r}
+merged_data = merged_data
+
+ba_major_counts_by_term <- aggregate(Major.1 ~ Term.Code, data = merged_data, function(x) sum(x == "BA Major"))
+
+ba_major_counts_by_term2 <- aggregate(Major.2 ~ Term.Code, data = merged_data, function(x) sum(x == "BA Major"))
+
+ba_major_counts_by_term3 <- aggregate(Major.3 ~ Term.Code, data = merged_data, function(x) sum(x == "BA Major"))
+
+# Assuming ba_major_counts_by_term, ba_major_counts_by_term2, ba_major_counts_by_term3 are your data frames
+merged_counts <- merge(ba_major_counts_by_term, ba_major_counts_by_term2, by = "Term.Code", all = TRUE)
+merged_counts <- merge(merged_counts, ba_major_counts_by_term3, by = "Term.Code", all = TRUE)
+
+# Replace missing values with zeros
+merged_counts[is.na(merged_counts)] <- 0
+
+# Set column names for clarity
+names(merged_counts) <- c("Term.Code", "BA_Major_Count_1", "BA_Major_Count_2", "BA_Major_Count_3")
+
+```
+
+```{r}
+merged_counts <- merged_counts %>%
+  mutate(Sum_BA_Major_Count = BA_Major_Count_1 + BA_Major_Count_2 + BA_Major_Count_3)
+
+merged_counts <- merged_counts %>%
+  select(Term.Code, Sum_BA_Major_Count)
+```
+
+```{r}
+merged_counts$Term.Code <- as.character(merged_counts$Term.Code)
+```
+
+```{r}
+new_data <- data.frame(
+  Term.Code = c(202420, 202510),
+  Sum_BA_Major_Count = c(356, 430))
+
+new <- rbind(merged_counts, new_data)
+
+p <- ggplot(new, aes(x = `Term.Code`, y = `Sum_BA_Major_Count`, fill = factor(`Term.Code`))) +
+  geom_bar(stat = "identity", color = "steelblue", width = 0.8) +
+  xlab("Term Code") +
+  ylab("Enrolled Student Count") +
+  ggtitle("Business Analytics Major Over Terms") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  geom_text(aes(label = `Sum_BA_Major_Count`), vjust = -0.5, color = "black", size = 3) +
+  coord_cartesian(ylim = c(0, 500)) +
+  scale_fill_manual(values = c(rep("steelblue", nrow(new) - 2), "orange", "orange"))+
+   guides(fill = FALSE)
+
+p
+## 51.5% change between 2022 and 2023
+## 21.5% change between 2023 and 2024
+## 36.5% average between those two growth rates
+```
+The pattern of the previous two years helped us project the coming two semesters. For spring 2024, the graph shows that the fall and spring enrollment are very similar. We used a naive forecast for 202420 to continue this pattern determining that the projected enrollment in the spring should be the same as the fall semester, 356 students. For the fall semester 2025, we used a simple average of the growth rate between previous two academic years to project the growth needed to calculate the 202510 forecast. There was a 51.5% growth between 202220 and 202310 enrollment. Between 202320 and 202410, there was a 21.5% growth. Averaging these two growth rates gets 36.5% growth from 202420 to 202510, or 430 students. The two projected enrollments are notes in the bar chart in orange. 
+
+# Predictive Model - XGBoost Classifier
+
+Our goal is to understand a business analytics student's progression through their program and therefore we added a flag (column with 1 or 0) to denote if they left their program or not (1= leave, 0 = stay) at anytime. With this information, we can track what students leave which we used in a predictive model as the target variable. 
+
 
