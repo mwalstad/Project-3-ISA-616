@@ -23,23 +23,23 @@ look to answer these questions: (1) Historically, what characteristics
 define students who stay with a Business Analytics program? (2) Is there
 a pattern to the number of students staying or leaving a Business
 Analytics program? (3) What courses have a significant impact on whether
-students stay with the business analytics major?
+students stay with the Business Analytics program?
 
 In this document, we analyzed data from Miami University's Farmer School
-of Business student data from fall 2018 to fall 2023 school years,
+of Business student data from fall 2018 to fall 2024 school years,
 provided by clients Alan Clift and Skip Benamati. This data included
 students who were enrolled in any Business Analytics program during
 their time at Miami. Programs include the Business Analytics Major,
-Minor, and ISA2 thematic sequence. We used a random forest model to
+Minor, and ISA2 thematic sequence. We used a XGBoost Classifier model to
 predict whether a student enrolled in the Business Analytics program
 would eventually drop based on the features of our model. We used a
 binary "flagging" target variable (column with 1 or 0) to denote if they
 left their program or not (1= leave, 0 = stay) at any time. Furthermore,
 we utilized portions of the student data, organized by program type, to
 conduct descriptive analysis on trends related to enrollment to support
-our analysis of answering the research questions above.
+our analysis of answering the research questions above and forecast student enrollment in each program for the following two semesters.
 
-### Business Value Propositions
+### Business Value Proposition
 
 ![](BVP_group8.png)
 
@@ -54,20 +54,20 @@ Jobs:
 -   Accurately predict demand for classes
 
 -   Understand the flow of students in and out of Business Analytics
-    major
+    programs
 
 Pains:
 
 -   Before:
 
-    -   Abundance of BA majors who end up dropping
+    -   Abundance of BA students who end up dropping
 
 -   During:
 
     -   Student retention -- understanding characteristics of students
-        who stay and do not stay with the BA major
+        who stay and do not stay with the BA program
 
-    -   Understanding what students are switching to the BA major
+    -   Understanding what students are switching to the BA program
 
     -   If BA courses have an impact on whether students stay in
         business analytics
@@ -78,19 +78,18 @@ Pains:
 
 Solution:
 
--   Time series analysis and prediction of future enrollment for the
+-   Descriptive analysis and projection of future enrollment for the
     next two semesters. A predictive model to determine is a student
     will drop or stay in their program.
 
 Pain Killers:
 
--   Identify key characteristics of students who leave the major
+-   Identify key characteristics of students who leave the program
 
 -   Identify classes that may need curriculum change in order to retain
     my students
 
--   Understand why students switch to the BA major and what majors they
-    come from
+-   Understand why students switch to the BA program
 
 Gains:
 
@@ -147,7 +146,7 @@ Minors, BA Major Students - Thematic Sequence ISA2.
     has a row for every term they have been enrolled. We dropped the
     index column called X
 
--   BA_Majors.csv: renamed to studentlist is similar to Attributes in
+-   BA_Majors.csv: renamed to studentlist, is similar to Attributes in
     which it identifies the student by Student.ID with a row for every
     term they have been enrolled at Miami. It also includes their
     cohort, and major (with a column for 3 potential majors. We dropped
@@ -270,7 +269,7 @@ merged_with_flag_and_grades = merged_with_flag_and_grades %>% select(-`Earned Ac
 
 ## Export Files
 
-We created two final files One tables is the merged student information
+We created two final files. One is the merged student information
 with the flag denoting if they left the program and their grades. The
 other file is the same information without a flag to use in our
 predictive model. Both of these tables are exported to .csv files as
@@ -285,17 +284,13 @@ write.csv(merged_with_flag_and_grades, 'StudentData_withGrades')
 write.csv(no_flag, 'StudentData_NoFlag')
 ```
 
-# Time Series Analysis
+# Descriptive Analysis and Forecast
 
 The following charts are the distinct counts of students enrolled in
 each business analytics programs. Programs include the Business
 Analytics Major, Minor, and thematic sequenced (named Applied Business
 Statistics). Each program is plotted individually over term from fall
-2018 to fall 2024. We intend on adding to each bar chart the % growth
-each semester and a line of best fit. Plotting the line of best fit will
-return a prediction for a future semester.We also intend on continuing
-to improve the aesthetics and understandably of each graph with better
-labeling and spacing.
+2018 to fall 2024 as a bar chart. Using a naive forecasts, simple average, and simple average of growth rate, we forecasted enrollment in each of the programs for the coming two sememsters. 
 
 ## ISA2 Applied Business Statistics Thematic Sequence Enrollment by Term
 
@@ -350,7 +345,7 @@ Using the data from the file, 'BA Minors.xlsx', we were able to graph
 the number of students enrolled in the Business Analytics minor. The
 file included the count of enrolled students by term which we displayed
 as a bar graph. Using this visual, we predicted the next two semesters,
-202420 and 202510, with a naive forecast. The most recent four semesters
+202420 and 202510, with a simple average of the previous two respective fall and springs semesters to forecast. The most recent four semesters
 (202220 through 202410) were consistent in enrollments and similar to
 the thematic sequence, following the pattern that the fall semester had
 fewer enrolled than the spring semester of that academic year.
@@ -388,7 +383,7 @@ p
 
 ## Business Analytics Major Enrollment by Term
 
-We conducted a time series analysis on the business analytics major
+We conducted a descriptive analysis on the business analytics major
 enrollment by term to project the next two semesters of enrollment. We
 used our merged data frame that was created with four student data files
 before adding student grade information and displays student information
@@ -458,8 +453,7 @@ p
 
 The pattern of the previous two years helped us project the coming two
 semesters. For spring 2024, the graph shows that the fall and spring
-enrollment are very similar. We used a naive forecast for 202420 to
-continue this pattern determining that the projected enrollment in the
+enrollment are very similar. We used a simple average of growth rates forecast for 202420 to continue this pattern determining that the projected enrollment in the
 spring should be the same as the fall semester, 356 students. For the
 fall semester 2025, we used a simple average of the growth rate between
 previous two academic years to project the growth needed to calculate
@@ -479,13 +473,38 @@ to denote if they left their program or not (1= leave, 0 = stay) at
 anytime. With this information, we can track what students leave which
 we used in a predictive model as the target variable.
 
-[Link to trained model](616model.html){:target="\_blank"}
+[Link to trained model](616model_final.html)
 
-inert Explanation of Model here
+The XGBoost Classifier we created had an accuracy score of 91.63%, with
+an AUC of 63.59% and a recall of 71.19% on class 1. The precision of
+class 1 was 89%. Feature importances revealed there were 20 important
+factors in the models.
 
 ### **Evaluation Metrics:**
 
-Test Classification Report:
+The accuracy is defined as the ratio of correct predictions to the total
+number of predictions. In this case, our model correctly predicted if a
+student will drop their program, 91.63% of the time. 
+
+Precision is concerned with the accuracy of the prediction of 1, or
+positive predictions. It is defined as the ratio of true positive
+predictions (correct prediction of 1's) to the total number of positive
+predictions made by the model. Our model has a precision of 89%, which
+means out of the times that we predict if the student dropped, we are
+correct 89% of the time.
+
+The most important metric to our model is the recall which measures the
+ratio of true positives to total predicted positives. We want to use
+this metric because it's more important to reduce the chance that our
+model missed a student who dropped their program than overestimating the
+number of students dropping. Our model has a 69.49% which means that we
+missed only about 30% of students who dropped the program. The model
+performs with moderate ability in this case. Each of these metrics are
+displayed in the classification report and confusion matrix of our
+trained model using testing data. The confusion matrix shows the
+distribution of True and predicted outcomes.
+
+Classification Report:
 
 ![](model_classification_report.png)
 
@@ -493,13 +512,55 @@ Confusion Matrix:
 
 ![](Model_confusion_matrix.png)
 
-ROC Curve
+ROC Curve:
+
+The Area Under the Curve (AUC) is a common metric used to evaluate the
+performance of a binary classification model, such as our XGBoost
+classifier. The ROC (Receiver Operating Characteristic) curve is a
+graphical representation of our model's ability to discriminate between
+the two classes (flag or no flag) across different probability
+thresholds. An AUC score of 63.59% for an XGBoost classifier predictive
+model means that, on average, the model is able to distinguish between
+the two classes with moderate reliability. The red line represents how
+well random guess performs so the goal is for a model to curve above the
+red line.
 
 ![](model_ROC_curve_AUC_score.png)
 
+Feature Importance
+
+![](model_feature_importance_bar_chart.png)
+
+The variables with the highest importance according to our feature
+importance analysis are Course_ISA125, Cohort.Term, Course_FIN301,
+A_Grade_Count, Course_BUS104.
+
 ### **Implementation**
 
-insert explanation here
+The XGBoost Classifier can be implemented into the Information Systems
+and Analytics department to help flag potential students who are likely
+to drop the program. The results of our Classifier answer our second
+research question, Is there a pattern to the number of students staying
+or leaving a Business Analytics program?
+
+Using our predictive model to flag students who drop the program, the
+feature importances shows what the most important variables are that
+affect the student's decision. We can see that courses such as ISA125,
+BUS104, and FIN301 have an influence on the flow of students. These
+feature importances answers our third research question. We also found
+that A and B grade count had an influence showing there are
+characteristics to the students who stay with a Business Analytics
+program. All of these important factors help determine what
+characteristics define students who stay with a Business Analytics
+program, answering our first research question.
+
+To help implement our predictive model, we created a guide that uses our
+trained model and takes new information, to predict if a student will
+drop or continue with their program.
 
 [Link to implementation
-guide](616implementation.html){:target="\_blank"}
+guide](616Model_implementation.html)
+
+Overall, we believe implementing our XGBoost Classifier and using our
+forecasts from our descriptive analysis will help eliminate Dr.
+Benamati's challenges.

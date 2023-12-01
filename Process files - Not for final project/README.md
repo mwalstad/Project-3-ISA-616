@@ -13,7 +13,7 @@ Max Lippman, Marti Walstad, Jenna Sayle, Alaina Edwards
 There is difficulty forecasting the number of students in a Business Analytics program resulting in challenges with class size planning. We look to answer these questions: 
 	(1) Historically, what characteristics define students who stay with a Business Analytics program? 
 	(2) Is there a pattern to the number of students staying or leaving a Business Analytics program?
-	(3) What courses have a significant impact on whether students stay with the business analytics major?
+	(3) What courses have a significant impact on whether students stay with the business analytics program?
 
 ## Business Value Proposition
 
@@ -21,27 +21,27 @@ Client:
 
 -   Skip Benamati Professor and chair of the Information Systems &
     Analytics along with his staff including Alan Clift (Data and
-    planning Analyst) and Professor, Alison Jones-Farmer. 
+    planning Analyst) and Professor, Alison Jones-Farmer.
 
 Jobs:
 
 -   Accurately predict demand for classes
 
 -   Understand the flow of students in and out of Business Analytics
-    major
+    programs
 
 Pains:
 
 -   Before:
 
-    -   Abundance of BA majors who end up dropping
+    -   Abundance of BA students who end up dropping
 
 -   During:
 
     -   Student retention -- understanding characteristics of students
-        who stay and do not stay with the BA major
+        who stay and do not stay with the BA program
 
-    -   Understanding what students are switching to the BA major
+    -   Understanding what students are switching to the BA program
 
     -   If BA courses have an impact on whether students stay in
         business analytics
@@ -52,17 +52,18 @@ Pains:
 
 Solution:
 
--   Time series analysis and prediction of future enrollment for the next two semesters. A predictive model to determine is a student will drop or stay in their program. 
+-   Descriptive analysis and projection of future enrollment for the
+    next two semesters. A predictive model to determine is a student
+    will drop or stay in their program.
 
 Pain Killers:
 
--   Identify key characteristics of students who leave the major
+-   Identify key characteristics of students who leave the program
 
 -   Identify classes that may need curriculum change in order to retain
     my students
 
--   Understand why students switch to the BA major and what majors they
-    come from
+-   Understand why students switch to the BA program
 
 Gains:
 
@@ -82,7 +83,8 @@ Gain Creators:
 
 ## Overview of Analysis
 
-In this document, we analyzed data from Miami University’s Farmer School of Business student data from fall 2018 to fall 2023 school years, provided by clients Alan Clift and Skip Benamati. This data included students who were enrolled in any Business Analytics program during their time at Miami. Programs include the Business Analytics Major, Minor, and ISA2 thematic sequence. We used a random forest model to predict whether a student enrolled in the Business Analytics program would eventually drop based on the features of our model. We used a binary “flagging” target variable (column with 1 or 0) to denote if they left their program or not (1= leave, 0 = stay) at any time. Furthermore, we utilized portions of the student data, organized by program type, to conduct descriptive analysis on trends related to enrollment to support our analysis of answering the research questions above.
+In this document, we analyzed data from Miami University's Farmer School of Business student data from fall 2018 to fall 2024 school years, provided by clients Alan Clift and Skip Benamati. This data included students who were enrolled in any Business Analytics program during their time at Miami. Programs include the Business Analytics Major, Minor, and ISA2 thematic sequence. We used a XGBoost Classifier model to predict whether a student enrolled in the Business Analytics program would eventually drop based on the features of our model. We used a
+binary "flagging" target variable (column with 1 or 0) to denote if they left their program or not (1= leave, 0 = stay) at any time. Furthermore, we utilized portions of the student data, organized by program type, to conduct descriptive analysis on trends related to enrollment to support our analysis of answering the research questions above and forecast student enrollment in each program for the following two semesters.
 
 
 ## Data Sources
@@ -133,10 +135,10 @@ In this document, we analyzed data from Miami University’s Farmer School of Bu
 10. StudentData_noFlag: Cleaned data file created by combining input files without the Flag variable. Used to test the predicitve model. 
 11. Project3-Final.rmd: Complete R-markdown file including Introduction, Research Questions, BVP, Cleaning Process, Descriptive Analysis, and Links to Predictive Model file. 
 12. Project3-Final.html: RMD file converted to HTML
-13. 616Model.ipynb: Created in Google Colab and exported to HTML. Links from Project3-Final connect here. Trains the predictive model. 
-14. 616Model.html: File converted from .ipynb to HTML
-15. 616Implementation.ipynb: Created in Google Colab and exported to HTML. Links from Project3-Final connect here. Implements the predictive model. 
-16. 616Implementation.html: File converted from .ipynb to HTML
+13. 616Model_final.ipynb: Created in Google Colab and exported to HTML. Links from Project3-Final connect here. Trains the predictive model. 
+14. 616Model_final.html: File converted from .ipynb to HTML
+15. 616Model_Implementation.ipynb: Created in Google Colab and exported to HTML. Links from Project3-Final connect here. Implements the predictive model. 
+16. 616Model_Implementation.html: File converted from .ipynb to HTML
 17. BVPgroup8.png: business value proposition diagram 
 18. model_ROC_curve_AUC_score.png: ROC cuve image from trained model results
 19. Model_confusion_matrix.png: Confusion Matrix image from trained model results
@@ -145,5 +147,5 @@ In this document, we analyzed data from Miami University’s Farmer School of Bu
 
 
 ## Final Deliverable
-The Project3-Final HTML file includes our entire research process including cleaning process and research products. This is our primary deliverable document. The two delivered products include a decriptive analysis with three bar charts and a predictive model to predict is students drop a business analytics program. The file links to a HTML file that can be used to imput data and project if a student will drop. 
+The Project3-Final HTML file includes our entire research process including cleaning process and research products. This is our primary deliverable document. The two delivered products include a decriptive analysis with three bar charts and a predictive model to predict is students drop a business analytics program. The file links to a HTML file that instructs on the implementation of the model to predict if a student will drop. 
 
